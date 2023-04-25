@@ -29,24 +29,24 @@
     private void InitializeComponent()
     {
             this.grpDBSetup = new System.Windows.Forms.GroupBox();
-            this.CloseDatabaseBtn = new System.Windows.Forms.Button();
-            this.LoadTablesBtn = new System.Windows.Forms.Button();
+            this.OpenDBBtn = new System.Windows.Forms.Button();
+            this.CloseDBBtn = new System.Windows.Forms.Button();
             this.CreateDBBtn = new System.Windows.Forms.Button();
             this.lblDBPath = new System.Windows.Forms.Label();
             this.FileDlgOpenDB = new System.Windows.Forms.OpenFileDialog();
             this.ClearDBBtn = new System.Windows.Forms.Button();
             this.grpDBMaintenance = new System.Windows.Forms.GroupBox();
             this.FileDlgSaveDB = new System.Windows.Forms.SaveFileDialog();
-            this.OpenDBBtn = new System.Windows.Forms.Button();
+            this.OpenFolderBtn = new System.Windows.Forms.Button();
             this.grpDBSetup.SuspendLayout();
             this.grpDBMaintenance.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpDBSetup
             // 
+            this.grpDBSetup.Controls.Add(this.OpenFolderBtn);
             this.grpDBSetup.Controls.Add(this.OpenDBBtn);
-            this.grpDBSetup.Controls.Add(this.CloseDatabaseBtn);
-            this.grpDBSetup.Controls.Add(this.LoadTablesBtn);
+            this.grpDBSetup.Controls.Add(this.CloseDBBtn);
             this.grpDBSetup.Controls.Add(this.CreateDBBtn);
             this.grpDBSetup.Controls.Add(this.lblDBPath);
             this.grpDBSetup.Location = new System.Drawing.Point(3, 3);
@@ -56,27 +56,26 @@
             this.grpDBSetup.TabStop = false;
             this.grpDBSetup.Text = "Database Setup";
             // 
-            // CloseDatabaseBtn
+            // OpenDBBtn
             // 
-            this.CloseDatabaseBtn.Enabled = false;
-            this.CloseDatabaseBtn.Location = new System.Drawing.Point(443, 80);
-            this.CloseDatabaseBtn.Name = "CloseDatabaseBtn";
-            this.CloseDatabaseBtn.Size = new System.Drawing.Size(145, 23);
-            this.CloseDatabaseBtn.TabIndex = 4;
-            this.CloseDatabaseBtn.Text = "Close Database";
-            this.CloseDatabaseBtn.UseVisualStyleBackColor = true;
-            this.CloseDatabaseBtn.Click += new System.EventHandler(this.CloseDatabaseBtn_Click);
+            this.OpenDBBtn.Location = new System.Drawing.Point(217, 21);
+            this.OpenDBBtn.Name = "OpenDBBtn";
+            this.OpenDBBtn.Size = new System.Drawing.Size(145, 23);
+            this.OpenDBBtn.TabIndex = 5;
+            this.OpenDBBtn.Text = "Open Database...";
+            this.OpenDBBtn.UseVisualStyleBackColor = true;
+            this.OpenDBBtn.Click += new System.EventHandler(this.OpenDBBtn_Click);
             // 
-            // LoadTablesBtn
+            // CloseDBBtn
             // 
-            this.LoadTablesBtn.Enabled = false;
-            this.LoadTablesBtn.Location = new System.Drawing.Point(217, 21);
-            this.LoadTablesBtn.Name = "LoadTablesBtn";
-            this.LoadTablesBtn.Size = new System.Drawing.Size(145, 23);
-            this.LoadTablesBtn.TabIndex = 3;
-            this.LoadTablesBtn.Text = "Create DB Schema";
-            this.LoadTablesBtn.UseVisualStyleBackColor = true;
-            this.LoadTablesBtn.Click += new System.EventHandler(this.LoadTablesBtn_Click);
+            this.CloseDBBtn.Enabled = false;
+            this.CloseDBBtn.Location = new System.Drawing.Point(368, 21);
+            this.CloseDBBtn.Name = "CloseDBBtn";
+            this.CloseDBBtn.Size = new System.Drawing.Size(145, 23);
+            this.CloseDBBtn.TabIndex = 4;
+            this.CloseDBBtn.Text = "Close Database";
+            this.CloseDBBtn.UseVisualStyleBackColor = true;
+            this.CloseDBBtn.Click += new System.EventHandler(this.CloseDBBtn_Click);
             // 
             // CreateDBBtn
             // 
@@ -136,15 +135,15 @@
             this.FileDlgSaveDB.FileName = "calls.sqlite";
             this.FileDlgSaveDB.Filter = "SQLite Database (*.sqlite) | *.sqlite";
             // 
-            // OpenDBBtn
+            // OpenFolderBtn
             // 
-            this.OpenDBBtn.Location = new System.Drawing.Point(443, 51);
-            this.OpenDBBtn.Name = "OpenDBBtn";
-            this.OpenDBBtn.Size = new System.Drawing.Size(145, 23);
-            this.OpenDBBtn.TabIndex = 5;
-            this.OpenDBBtn.Text = "Open Database...";
-            this.OpenDBBtn.UseVisualStyleBackColor = true;
-            this.OpenDBBtn.Click += new System.EventHandler(this.OpenDBBtn_Click);
+            this.OpenFolderBtn.Location = new System.Drawing.Point(383, 78);
+            this.OpenFolderBtn.Name = "OpenFolderBtn";
+            this.OpenFolderBtn.Size = new System.Drawing.Size(205, 25);
+            this.OpenFolderBtn.TabIndex = 6;
+            this.OpenFolderBtn.Text = "Open Containing Folder";
+            this.OpenFolderBtn.UseVisualStyleBackColor = true;
+            this.OpenFolderBtn.Click += new System.EventHandler(this.OpenFolderBtn_Click);
             // 
             // DBSetupUsrCtl
             // 
@@ -170,9 +169,9 @@
         private OpenFileDialog FileDlgOpenDB;
         private Button ClearDBBtn;
         private GroupBox grpDBMaintenance;
-        private Button LoadTablesBtn;
-        private Button CloseDatabaseBtn;
+        private Button CloseDBBtn;
         private SaveFileDialog FileDlgSaveDB;
         private Button OpenDBBtn;
+        private Button OpenFolderBtn;
     }
 }

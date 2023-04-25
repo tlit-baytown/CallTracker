@@ -34,8 +34,8 @@
             this.TabPageApplicationSettings = new System.Windows.Forms.TabPage();
             this.tlpSettingsButtons = new System.Windows.Forms.TableLayoutPanel();
             this.CancelChangesBtn = new System.Windows.Forms.Button();
-            this.SaveSettingsBtn = new System.Windows.Forms.Button();
             this.ResetToDefaultBtn = new System.Windows.Forms.Button();
+            this.SaveSettingsBtn = new System.Windows.Forms.Button();
             this.SettingTabs.SuspendLayout();
             this.tlpSettingsButtons.SuspendLayout();
             this.SuspendLayout();
@@ -109,17 +109,6 @@
             this.CancelChangesBtn.UseVisualStyleBackColor = true;
             this.CancelChangesBtn.Click += new System.EventHandler(this.CancelChangesBtn_Click);
             // 
-            // SaveSettingsBtn
-            // 
-            this.SaveSettingsBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SaveSettingsBtn.Location = new System.Drawing.Point(3, 3);
-            this.SaveSettingsBtn.Name = "SaveSettingsBtn";
-            this.SaveSettingsBtn.Size = new System.Drawing.Size(553, 34);
-            this.SaveSettingsBtn.TabIndex = 0;
-            this.SaveSettingsBtn.Text = "Save Settings";
-            this.SaveSettingsBtn.UseVisualStyleBackColor = true;
-            this.SaveSettingsBtn.Click += new System.EventHandler(this.SaveSettingsBtn_Click);
-            // 
             // ResetToDefaultBtn
             // 
             this.ResetToDefaultBtn.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -131,6 +120,17 @@
             this.ResetToDefaultBtn.UseVisualStyleBackColor = true;
             this.ResetToDefaultBtn.Click += new System.EventHandler(this.ResetToDefaultBtn_Click);
             // 
+            // SaveSettingsBtn
+            // 
+            this.SaveSettingsBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SaveSettingsBtn.Location = new System.Drawing.Point(3, 3);
+            this.SaveSettingsBtn.Name = "SaveSettingsBtn";
+            this.SaveSettingsBtn.Size = new System.Drawing.Size(553, 34);
+            this.SaveSettingsBtn.TabIndex = 0;
+            this.SaveSettingsBtn.Text = "Save Settings";
+            this.SaveSettingsBtn.UseVisualStyleBackColor = true;
+            this.SaveSettingsBtn.Click += new System.EventHandler(this.SaveSettingsBtn_Click);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
@@ -138,8 +138,11 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.SettingTabs);
             this.Controls.Add(this.tlpSettingsButtons);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "SettingsForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
             this.Load += new System.EventHandler(this.SettingsForm_Load);
             this.SettingTabs.ResumeLayout(false);
             this.tlpSettingsButtons.ResumeLayout(false);

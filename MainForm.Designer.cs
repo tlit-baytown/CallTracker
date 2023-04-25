@@ -40,9 +40,8 @@
             this.btnCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.btnPaste = new System.Windows.Forms.ToolStripMenuItem();
             this.btnSettings = new System.Windows.Forms.ToolStripMenuItem();
-            this.imgPanel = new System.Windows.Forms.Panel();
-            this.dbWorker = new System.ComponentModel.BackgroundWorker();
             this.OpenLogFolderBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.openDBWorker = new System.ComponentModel.BackgroundWorker();
             this.mainMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -144,21 +143,6 @@
             this.btnSettings.Text = "Settings";
             this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
             // 
-            // imgPanel
-            // 
-            this.imgPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imgPanel.Location = new System.Drawing.Point(0, 24);
-            this.imgPanel.Name = "imgPanel";
-            this.imgPanel.Size = new System.Drawing.Size(1131, 562);
-            this.imgPanel.TabIndex = 1;
-            // 
-            // dbWorker
-            // 
-            this.dbWorker.WorkerReportsProgress = true;
-            this.dbWorker.WorkerSupportsCancellation = true;
-            this.dbWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DbWorker_DoWork);
-            this.dbWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.DbWorker_RunWorkerCompleted);
-            // 
             // OpenLogFolderBtn
             // 
             this.OpenLogFolderBtn.Name = "OpenLogFolderBtn";
@@ -166,13 +150,20 @@
             this.OpenLogFolderBtn.Text = "Open Log Folder";
             this.OpenLogFolderBtn.Click += new System.EventHandler(this.OpenLogFolderBtn_Click);
             // 
+            // openDBWorker
+            // 
+            this.openDBWorker.WorkerReportsProgress = true;
+            this.openDBWorker.WorkerSupportsCancellation = true;
+            this.openDBWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.openDBWorker_DoWork);
+            this.openDBWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.openDBWorker_RunWorkerCompleted);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1131, 586);
-            this.Controls.Add(this.imgPanel);
             this.Controls.Add(this.mainMenuStrip);
+            this.IsMdiContainer = true;
             this.MainMenuStrip = this.mainMenuStrip;
             this.Name = "MainForm";
             this.Text = "Call Tracker";
@@ -198,8 +189,7 @@
         private ToolStripMenuItem btnCopy;
         private ToolStripMenuItem btnPaste;
         private ToolStripMenuItem btnSettings;
-        private Panel imgPanel;
-        private System.ComponentModel.BackgroundWorker dbWorker;
+        private System.ComponentModel.BackgroundWorker openDBWorker;
         private ToolStripMenuItem OpenLogFolderBtn;
     }
 }

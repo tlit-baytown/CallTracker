@@ -12,7 +12,7 @@ namespace CallTracker_Lib.database
         private SQLiteConnection? _sqlite = null;
         private string _connectionString;
 
-        private bool _lastConnectionSuccessfull = false;
+        private static bool _lastConnectionSuccessfull = false;
 
         public DBConnection(string connectionString)
         {
@@ -49,7 +49,7 @@ namespace CallTracker_Lib.database
             return _sqlite;
         }
 
-        public bool IsConnected() { return _lastConnectionSuccessfull; }
+        public static bool IsConnected() { return _lastConnectionSuccessfull; }
 
         public static string CreateConnectionString(string filePath)
         {

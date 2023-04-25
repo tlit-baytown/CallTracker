@@ -39,8 +39,12 @@ namespace CallTracker_GUI.subforms
             foreach (ISettingPage settingPage in settingPages)
             {
                 if (!settingPage.SettingsUnchanged)
+                {
                     settingPage.SaveSettings();
+                    settingPage.SettingsUnchanged = true;
+                }
             }
+            MessageBox.Show(this, "Settings Saved!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             Logger.Info("Settings have been updated.");
         }
 
@@ -58,7 +62,35 @@ namespace CallTracker_GUI.subforms
 
         private void CancelChangesBtn_Click(object sender, EventArgs e)
         {
+            Close();
+        }
 
+        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!CheckForChanges())
+                e.Cancel = true;
+        }
+        
+        /// <summary>
+        /// Checks for pending changes on the settings.
+        /// </summary>
+        /// <returns>True: if changes are pending and user confirms -or- changes are not pending and closing is safe; False: if changes are pending and user responds to not close settings.</returns>
+        private bool CheckForChanges()
+        {
+            bool changesPending = false;
+            foreach (ISettingPage settingPage in settingPages)
+                if (settingPage.SettingsUnchanged == false)
+                    changesPending = true;
+            if (changesPending)
+            {
+                DialogResult response = MessageBox.Show(this, "There are changes pending to the settings. Are you sure you want to cancel?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (response == DialogResult.Yes)
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return true;
         }
     }
 }

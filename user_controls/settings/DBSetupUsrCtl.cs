@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace CallTracker_GUI.user_controls
     public partial class DBSetupUsrCtl : UserControl, ISettingPage
     {
         public string UniqueName { get => "db_setup"; }
-        public bool SettingsUnchanged { get; set; }
+        public bool SettingsUnchanged { get; set; } = true;
 
         private string _dbPath = string.Empty;
         private string _connectString = string.Empty;
@@ -38,19 +39,14 @@ namespace CallTracker_GUI.user_controls
             if (Settings.Default.DBPath.Equals(string.Empty))
             {
                 lblDBPath.Text = "No Database Found.";
-                LoadTablesBtn.Enabled = false;
-                CreateDBBtn.Enabled = true;
-                CloseDatabaseBtn.Enabled = false;
             }
             else
             {
-                lblDBPath.Text = Settings.Default.DBPath;
-                CreateDBBtn.Enabled = false;
-                LoadTablesBtn.Enabled = true;
-                CloseDatabaseBtn.Enabled = true;
-
+                _dbPath = Settings.Default.DBPath;
+                lblDBPath.Text = _dbPath;
                 _connectionSuccessful = DBConnection.TouchFile(Settings.Default.ConnectionString);
             }
+            SetButtons();
         }
 
         public void ResetSettings()
@@ -69,23 +65,29 @@ namespace CallTracker_GUI.user_controls
         {
             if (FileDlgSaveDB.ShowDialog() == DialogResult.OK)
             {
-                bool success = CreateOpenDB(FileDlgSaveDB.FileName);
-                if (!success)
+                _connectionSuccessful = CreateOrOpenDatabase(FileDlgSaveDB.FileName);
+                if (!_connectionSuccessful)
                     MessageBox.Show(this, "The database file could not be saved.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else
+                    SettingsUnchanged = false;
             }
+            SetButtons();
         }
 
         private void OpenDBBtn_Click(object sender, EventArgs e)
         {
             if (FileDlgOpenDB.ShowDialog() == DialogResult.OK)
             {
-                bool success = CreateOpenDB(FileDlgOpenDB.FileName);
-                if (!success)
+                _connectionSuccessful = CreateOrOpenDatabase(FileDlgOpenDB.FileName);
+                if (!_connectionSuccessful)
                     MessageBox.Show(this, "The database file could not be opened or read from.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else
+                    SettingsUnchanged = false;
             }
+            SetButtons();
         }
 
-        private bool CreateOpenDB(string fileName)
+        private bool CreateOrOpenDatabase(string fileName)
         {
             _dbPath = fileName;
             _connectString = DBConnection.CreateConnectionString(fileName);
@@ -93,40 +95,30 @@ namespace CallTracker_GUI.user_controls
             return DBConnection.TouchFile(_connectString); //test and make sure the connection could be created.
         }
 
-        private void LoadTablesBtn_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void CloseDatabaseBtn_Click(object sender, EventArgs e)
+        private void CloseDBBtn_Click(object sender, EventArgs e)
         {
             if (_dbPath.Equals(string.Empty))
-            {
                 MessageBox.Show(this, "There is no database open that can be closed.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
             else
             {
                 _dbPath = string.Empty;
                 _connectString = string.Empty;
                 lblDBPath.Text = "No Database Found.";
-                SetButtons();
+                _connectionSuccessful = false;
             }
+            SetButtons();
+        }
+
+        private void OpenFolderBtn_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", _dbPath[.._dbPath.LastIndexOf('\\')]);
         }
 
         private void SetButtons()
         {
-            if (_connectionSuccessful)
-            {
-                CreateDBBtn.Enabled = false;
-                LoadTablesBtn.Enabled = false;
-                OpenDBBtn.Enabled = false;
-                CloseDatabaseBtn.Enabled = true;
-            }
-            else
-            {
-
-            }
+            CreateDBBtn.Enabled = !_connectionSuccessful;
+            OpenDBBtn.Enabled = !_connectionSuccessful;
+            CloseDBBtn.Enabled = !CreateDBBtn.Enabled;
         }
     }
 }
