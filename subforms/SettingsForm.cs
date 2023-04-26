@@ -19,7 +19,7 @@ namespace CallTracker_GUI.subforms
 
         private List<ISettingPage> settingPages = new List<ISettingPage>
         {
-            new DBSetupUsrCtl(), new CompanySetupUsrCtl(), new ApplicationSetupUsrCtl()
+            new DBSetupUsrCtl(), new CompanySetupUsrCtl()
         };
 
         public SettingsForm()
@@ -31,7 +31,6 @@ namespace CallTracker_GUI.subforms
         {
             TabPageDBSettings.Controls.Add(settingPages.Find(n => n.UniqueName.Equals("db_setup")) as UserControl);
             TabPageCompanySettings.Controls.Add(settingPages.Find(n => n.UniqueName.Equals("comp_settings")) as UserControl);
-            TabPageApplicationSettings.Controls.Add(settingPages.Find(n => n.UniqueName.Equals("app_settings")) as UserControl);
         }
 
         private void SaveSettingsBtn_Click(object sender, EventArgs e)

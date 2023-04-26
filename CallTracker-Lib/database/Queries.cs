@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CallTracker_Lib.Enums;
+using static CallTracker_Lib.utility.Enums;
 
 namespace CallTracker_Lib.database
 {

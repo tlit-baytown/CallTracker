@@ -2,7 +2,6 @@ using CallTracker_GUI.Properties;
 using CallTracker_GUI.subforms;
 using CallTracker_Lib.database;
 using System.Diagnostics;
-using SixLabors.ImageSharp;
 
 namespace CallTracker
 {
@@ -23,16 +22,20 @@ namespace CallTracker
 
         private void openDBWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            _connectionObj = new DBConnection(Settings.Default.ConnectionString);
-            openDBWorker.ReportProgress(100);
+            bool result = DBConnection.TouchFile(Settings.Default.ConnectionString);
+            openDBWorker.ReportProgress(100, result);
         }
 
         private void openDBWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            if (_connectionObj == null || !_connectionObj.IsConnected())
+            if (e.Result != null && e.Result is bool)
             {
-                MessageBox.Show("The database could not be opened. The application settings will now open so you can set the database up.");
-                new SettingsForm().ShowDialog();
+                bool connected = (bool)e.Result;
+                if (!connected)
+                {
+                    MessageBox.Show("The database could not be opened. The application settings will now open so you can set the database up.");
+                    new SettingsForm().ShowDialog();
+                }
             }
         }
 

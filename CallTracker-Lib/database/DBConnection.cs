@@ -10,7 +10,7 @@ namespace CallTracker_Lib.database
         private readonly NLog.Logger Logger = LogManager<DBConnection>.GetLogger();
 
         private SQLiteConnection? _sqlite = null;
-        private string _connectionString;
+        private static string? _connectionString;
 
         private static bool _lastConnectionSuccessfull = false;
 
@@ -20,7 +20,7 @@ namespace CallTracker_Lib.database
             CreateConnection();
         }
 
-        private SQLiteConnection? CreateConnection()
+        public SQLiteConnection? CreateConnection()
         {
             return CreateConnection(_connectionString);
         }
@@ -76,7 +76,14 @@ namespace CallTracker_Lib.database
                 return false;
             }
             finally { conn.Close(); }
+
+            _connectionString = connectionString;
             return true;
+        }
+
+        public static string? GetConnectionString()
+        {
+            return _connectionString;
         }
     }
 }

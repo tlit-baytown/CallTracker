@@ -31,7 +31,6 @@
             this.SettingTabs = new System.Windows.Forms.TabControl();
             this.TabPageDBSettings = new System.Windows.Forms.TabPage();
             this.TabPageCompanySettings = new System.Windows.Forms.TabPage();
-            this.TabPageApplicationSettings = new System.Windows.Forms.TabPage();
             this.tlpSettingsButtons = new System.Windows.Forms.TableLayoutPanel();
             this.CancelChangesBtn = new System.Windows.Forms.Button();
             this.ResetToDefaultBtn = new System.Windows.Forms.Button();
@@ -44,7 +43,6 @@
             // 
             this.SettingTabs.Controls.Add(this.TabPageDBSettings);
             this.SettingTabs.Controls.Add(this.TabPageCompanySettings);
-            this.SettingTabs.Controls.Add(this.TabPageApplicationSettings);
             this.SettingTabs.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SettingTabs.Location = new System.Drawing.Point(0, 0);
             this.SettingTabs.Name = "SettingTabs";
@@ -71,15 +69,6 @@
             this.TabPageCompanySettings.TabIndex = 1;
             this.TabPageCompanySettings.Text = "Company Setup";
             this.TabPageCompanySettings.UseVisualStyleBackColor = true;
-            // 
-            // TabPageApplicationSettings
-            // 
-            this.TabPageApplicationSettings.Location = new System.Drawing.Point(4, 25);
-            this.TabPageApplicationSettings.Name = "TabPageApplicationSettings";
-            this.TabPageApplicationSettings.Size = new System.Drawing.Size(792, 381);
-            this.TabPageApplicationSettings.TabIndex = 2;
-            this.TabPageApplicationSettings.Text = "Application Setup";
-            this.TabPageApplicationSettings.UseVisualStyleBackColor = true;
             // 
             // tlpSettingsButtons
             // 
@@ -155,7 +144,6 @@
     private TabControl SettingTabs;
     private TabPage TabPageDBSettings;
     private TabPage TabPageCompanySettings;
-    private TabPage TabPageApplicationSettings;
     private TableLayoutPanel tlpSettingsButtons;
     private Button CancelChangesBtn;
     private Button SaveSettingsBtn;
