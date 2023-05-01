@@ -238,17 +238,16 @@ namespace CallTracker_Lib.database
         #endregion
 
         #region Call Log
-        /*
-        public static int InsertAppOwner(AppOwner owner)
+        public static int InsertCallLog(CallLog log)
         {
             int affectedRows = 0;
-            ArrayList? columns = GetColumns("app_owner");
+            ArrayList? columns = GetColumns("call_log");
             if (columns == null)
                 return -1;
             columns.RemoveAt(0); //remove the id column
             columns.TrimToSize();
 
-            string q = Queries.BuildQuery(QType.INSERT, "app_owner", null, columns);
+            string q = Queries.BuildQuery(QType.INSERT, "call_log", null, columns);
 
             using SQLiteConnection conn = new SQLiteConnection(DBConnection.GetConnectionString());
             if (conn == null)
@@ -260,9 +259,11 @@ namespace CallTracker_Lib.database
                 using SQLiteCommand cmd = new(q, conn, tr);
                 cmd.CommandType = CommandType.Text;
 
-                cmd.Parameters.AddWithValue("@0", owner.Name);
-                cmd.Parameters.AddWithValue("@1", owner.Base64Logo);
-                cmd.Parameters.AddWithValue("@2", owner.PhoneNumber);
+                cmd.Parameters.AddWithValue("@0", log.CompanyID);
+                cmd.Parameters.AddWithValue("@1", log.NoteManager == null ? string.Empty : log.NoteManager.ToString());
+                cmd.Parameters.AddWithValue("@2", log.NextCallDate.Ticks);
+                cmd.Parameters.AddWithValue("@3", log.LastCallDate.Ticks);
+                cmd.Parameters.AddWithValue("@4", log.LastContactDate.Ticks);
                 affectedRows = cmd.ExecuteNonQuery();
 
                 if (affectedRows > 0)
@@ -272,16 +273,16 @@ namespace CallTracker_Lib.database
             }
 
             conn.Close();
-            return affectedRows != 0 ? GetLastRowIDInserted("app_owner") : -1;
+            return affectedRows != 0 ? GetLastRowIDInserted("call_log") : -1;
         }
 
-        public static bool UpdateAppOwner(AppOwner owner)
+        public static bool UpdateCallLog(CallLog log)
         {
             int affectedRows = 0;
-            ArrayList? columns = GetColumns("app_owner");
+            ArrayList? columns = GetColumns("call_log");
             if (columns == null)
                 return false;
-            string q = Queries.BuildQuery(QType.UPDATE, "app_owner", null, columns, $"id={owner.ID}");
+            string q = Queries.BuildQuery(QType.UPDATE, "call_log", null, columns, $"id={log.ID}");
 
             using SQLiteConnection conn = new(DBConnection.GetConnectionString());
             if (conn == null)
@@ -293,10 +294,12 @@ namespace CallTracker_Lib.database
                 using SQLiteCommand cmd = new(q, conn, tr);
                 cmd.CommandType = CommandType.Text;
 
-                cmd.Parameters.AddWithValue("@0", owner.ID);
-                cmd.Parameters.AddWithValue("@1", owner.Name);
-                cmd.Parameters.AddWithValue("@2", owner.Base64Logo);
-                cmd.Parameters.AddWithValue("@3", owner.PhoneNumber);
+                cmd.Parameters.AddWithValue("@0", log.ID);
+                cmd.Parameters.AddWithValue("@1", log.CompanyID);
+                cmd.Parameters.AddWithValue("@2", log.NoteManager == null ? string.Empty : log.NoteManager.ToString());
+                cmd.Parameters.AddWithValue("@3", log.NextCallDate.Ticks);
+                cmd.Parameters.AddWithValue("@4", log.LastCallDate.Ticks);
+                cmd.Parameters.AddWithValue("@5", log.LastContactDate.Ticks);
                 affectedRows = cmd.ExecuteNonQuery();
 
                 if (affectedRows > 0)
@@ -309,10 +312,10 @@ namespace CallTracker_Lib.database
             return affectedRows != 0;
         }
 
-        public static AppOwner? GetAppOwner(int id)
+        public static CallLog? GetCallLog(int id)
         {
-            AppOwner? owner = null;
-            string q = Queries.BuildQuery(QType.SELECT, "app_owner", null, null, $"id={id}");
+            CallLog? log = null;
+            string q = Queries.BuildQuery(QType.SELECT, "call_log", null, null, $"id={id}");
 
             using SQLiteConnection conn = new(DBConnection.GetConnectionString());
             conn.Open();
@@ -322,23 +325,25 @@ namespace CallTracker_Lib.database
             if (reader.HasRows)
             {
                 reader.Read();
-                owner = new AppOwner
+                log = new CallLog
                 {
                     ID = reader.GetInt32(0),
-                    Name = reader.GetString(1),
-                    Base64Logo = reader.GetString(2),
-                    PhoneNumber = reader.GetString(3)
+                    CompanyID = reader.GetInt32(1),
+                    NoteManager = new NoteManager(reader.GetString(2)),
+                    NextCallDate = new DateTime(int.Parse(reader.GetString(3))),
+                    LastCallDate = new DateTime(int.Parse(reader.GetString(4))),
+                    LastContactDate = new DateTime(int.Parse(reader.GetString(5)))
                 };
             }
 
             conn.Close();
-            return owner;
+            return log;
         }
 
-        public static List<AppOwner> GetAppOwners()
+        public static List<CallLog> GetCallLogs()
         {
-            List<AppOwner> appOwners = new List<AppOwner>();
-            string q = Queries.BuildQuery(QType.SELECT, "app_owner");
+            List<CallLog> logs = new List<CallLog>();
+            string q = Queries.BuildQuery(QType.SELECT, "call_log");
 
             using SQLiteConnection conn = new(DBConnection.GetConnectionString());
             conn.Open();
@@ -349,25 +354,27 @@ namespace CallTracker_Lib.database
             {
                 while (reader.Read())
                 {
-                    AppOwner owner = new AppOwner
-                    {
-                        ID = reader.GetInt32(0),
-                        Name = reader.GetString(1),
-                        Base64Logo = reader.GetString(2),
-                        PhoneNumber = reader.GetString(3)
-                    };
-                    appOwners.Add(owner);
+                    CallLog log = new CallLog
+                        {
+                            ID = reader.GetInt32(0),
+                            CompanyID = reader.GetInt32(1),
+                            NoteManager = new NoteManager(reader.GetString(2)),
+                            NextCallDate = new DateTime(int.Parse(reader.GetString(3))),
+                            LastCallDate = new DateTime(int.Parse(reader.GetString(4))),
+                            LastContactDate = new DateTime(int.Parse(reader.GetString(5)))
+                        };
+                    logs.Add(log);
                 }
             }
 
             conn.Close();
-            return appOwners;
+            return logs;
         }
 
-        public static bool DeleteAppOwner(AppOwner owner)
+        public static bool DeleteCallLog(CallLog log)
         {
             int affectedRows = 0;
-            string q = Queries.BuildQuery(QType.DELETE, "app_owner", null, null, $"id={owner.ID}");
+            string q = Queries.BuildQuery(QType.DELETE, "call_log", null, null, $"id={log.ID}");
 
             try
             {
@@ -390,7 +397,6 @@ namespace CallTracker_Lib.database
             }
             return affectedRows != 0;
         }
-        */
         #endregion
     }
 }

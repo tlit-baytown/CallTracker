@@ -36,18 +36,6 @@ namespace CallTracker_Lib
         /// <param name="title"></param>
         public Note(string content) : this(string.Empty, content) { }
 
-        ///// <summary>
-        ///// Create a new note from an existing database string.
-        ///// </summary>
-        ///// <param name="dbContent"></param>
-        ///// <exception cref="ArgumentNullException">If the database string is empty or null</exception>
-        //public Note(string dbContent)
-        //{
-        //    if (dbContent == string.Empty || dbContent == null)
-        //        throw new ArgumentNullException(nameof(dbContent));
-        //    _note = new StringBuilder(dbContent);
-        //}
-
         /// <summary>
         /// Builds the note into a single string with the hex seperators specified in <see cref="NoteManager"/>.
         /// </summary>
@@ -56,9 +44,9 @@ namespace CallTracker_Lib
             _note = new StringBuilder();
 
             if (_noteTitle.Length > 0)
-                _note = _note.Append(NoteManager.TITLE_ID).Append(_noteTitle);
+                _note = _note.Append(NoteManager.TITLE_ID).Append(_noteTitle); //append title seperator and title
             if (_noteContent.Length > 0)
-                _note = _note.Append(NoteManager.CONTENT_ID).Append(_noteContent);
+                _note = _note.Append(NoteManager.CONTENT_ID).Append(_noteContent); //append content seperator and content
             _note = _note.Append(NoteManager.SEPERATOR_ID); //append note seperator
         }
 

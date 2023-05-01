@@ -63,7 +63,11 @@ namespace CallTracker_Lib.utility
             AddressInsert,
             AddressUpdate,
             AddressDelete,
-            AddressIncomplete
+            AddressIncomplete,
+            CallLogInsert,
+            CallLogUpdate,
+            CallLogDelete,
+            CallLogIncomplete
         }
 
         /// <summary>

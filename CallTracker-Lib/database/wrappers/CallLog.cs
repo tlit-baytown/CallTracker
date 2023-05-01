@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static CallTracker_Lib.utility.Enums;
 
 namespace CallTracker_Lib.database.wrappers
 {
@@ -17,28 +18,42 @@ namespace CallTracker_Lib.database.wrappers
         [Browsable(false)]
         public int ID { get; set; }
 
+        [Browsable(false)]
         public int CompanyID { get; set; }
 
-        public string Notes { get; set; } = string.Empty;
+        public NoteManager? NoteManager { get; set; } = null;
+
         public DateTime NextCallDate { get; set; }
         public DateTime LastCallDate { get; set; }
         public DateTime LastContactDate { get; set; }
 
-        public bool IsEmpty => throw new NotImplementedException();
+        public bool IsEmpty => false;
 
-        public Enums.DatabaseError Delete()
+        public DatabaseError Delete()
         {
-            throw new NotImplementedException();
+            return SQLiteConnector.DeleteCallLog(this) ? DatabaseError.NoError : DatabaseError.CallLogDelete;
         }
 
-        public Enums.DatabaseError Insert()
+        public DatabaseError Insert()
         {
-            throw new NotImplementedException();
+            DatabaseError e;
+            if (!IsEmpty)
+            {
+                if (ID == 0)
+                {
+                    ID = SQLiteConnector.InsertCallLog(this);
+                    e = ID != 0 ? DatabaseError.NoError : DatabaseError.CallLogInsert;
+                }
+                else
+                    e = SQLiteConnector.UpdateCallLog(this) ? DatabaseError.NoError : DatabaseError.CallLogUpdate;
+                return e;
+            }
+            return DatabaseError.CallLogIncomplete;
         }
 
-        public Enums.DatabaseError Update()
+        public DatabaseError Update()
         {
-            throw new NotImplementedException();
+            return Insert();
         }
     }
 }

@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace CallTracker_Lib
 {
+    /// <summary>
+    /// Manager class responsible for maininting a list of <see cref="Note"/> objects, creating a storable
+    /// string, and parsing the string from the database into a list of <see cref="Note"/> objects.
+    /// </summary>
     public class NoteManager
     {
         private static readonly Logger Logger = logging.LogManager<NoteManager>.GetLogger();
