@@ -39,8 +39,6 @@ namespace CallTracker_Lib.database.wrappers
             }
         }
 
-        public List<IDBWrapper> AssociatedObjects => new List<IDBWrapper>();
-
         public AppOwner() { }
 
         public AppOwner(int id, string name, string base64Logo, string phoneNumber)

@@ -18,11 +18,6 @@ namespace CallTracker_Lib.interfaces
         public bool IsEmpty { get; }
 
         /// <summary>
-        /// Get a list of IDBWrapper objects associated with this wrapper.
-        /// </summary>
-        public List<IDBWrapper> AssociatedObjects { get; }
-
-        /// <summary>
         /// Defines the behavior for inserting the object's data into the database.
         /// </summary>
         /// <returns>True: the record was inserted successfully; False: the record could not be inserted.</returns>

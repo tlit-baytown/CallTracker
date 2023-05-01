@@ -10,6 +10,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallTracker_GUI", "CallTrac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallTracker_Lib", "CallTracker-Lib\CallTracker_Lib.csproj", "{C06EC3A7-A9EB-4E36-A54F-BC044C447148}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLibrary", "TestLibrary\TestLibrary.csproj", "{0B72B23F-16F5-4498-B934-3BA469AC8E03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{C06EC3A7-A9EB-4E36-A54F-BC044C447148}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C06EC3A7-A9EB-4E36-A54F-BC044C447148}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C06EC3A7-A9EB-4E36-A54F-BC044C447148}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B72B23F-16F5-4498-B934-3BA469AC8E03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B72B23F-16F5-4498-B934-3BA469AC8E03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B72B23F-16F5-4498-B934-3BA469AC8E03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B72B23F-16F5-4498-B934-3BA469AC8E03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
