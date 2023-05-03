@@ -1,0 +1,14 @@
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\bin\Debug\net6.0\CallTracker_Lib.deps.json
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\bin\Debug\net6.0\CallTracker_Lib.runtimeconfig.json
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\bin\Debug\net6.0\CallTracker_Lib.dll
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\bin\Debug\net6.0\CallTracker_Lib.pdb
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\CallTracker_Lib.csproj.AssemblyReference.cache
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\CallTracker_Lib.Properties.Resources.resources
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\CallTracker_Lib.csproj.GenerateResource.cache
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\CallTracker_Lib.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\CallTracker_Lib.csproj.CoreCompileInputs.cache
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\CallTracker_Lib.dll
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\refint\CallTracker_Lib.dll
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\CallTracker_Lib.pdb
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\CallTracker_Lib.genruntimeconfig.cache
+C:\Users\Kelvin\Documents\Projects\Github\CallTracker\CallTracker-Lib\obj\Debug\net6.0\ref\CallTracker_Lib.dll

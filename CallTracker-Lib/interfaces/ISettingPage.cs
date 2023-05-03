@@ -10,7 +10,7 @@ namespace CallTracker_Lib.interfaces
     /// Defines an interface for a Settings User Control.
     /// <para>A settings page should define methods for saving, loading, and resetting settings pertinent to that page.</para>
     /// </summary>
-    internal interface ISettingPage
+    public interface ISettingPage
     {
         /// <summary>
         /// The unique name of the settings page.

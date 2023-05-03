@@ -18,17 +18,17 @@ namespace CallTracker_Lib
         /// <summary>
         /// Random hex identifier to mark start of note title.
         /// </summary>
-        internal static readonly int TITLE_ID = 0x2A0F1B;
+        internal static readonly string TITLE_ID = "<0x2A0F1B>";
 
         /// <summary>
         /// Random hex identifier to mark start of note content.
         /// </summary>
-        internal static readonly int CONTENT_ID = 0x2A0F1C;
+        internal static readonly string CONTENT_ID = "<0x2A0F1C>";
 
         /// <summary>
-        /// Random hex identified to mark the seperation between notes.
+        /// Random hex identifier to mark the seperation between notes.
         /// </summary>
-        internal static readonly int SEPERATOR_ID = 0x2A0F1D;
+        internal static readonly string SEPERATOR_ID = "<0x2A0F1D>";
 
         private List<Note> _notes = new List<Note>();
 
@@ -88,24 +88,24 @@ namespace CallTracker_Lib
         public void Parse(string dbContent)
         {
             _notes.Clear();
-            string[] unparsedNotes = dbContent.Split(SEPERATOR_ID.ToString(), StringSplitOptions.RemoveEmptyEntries);
+            string[] unparsedNotes = dbContent.Split(SEPERATOR_ID, StringSplitOptions.RemoveEmptyEntries);
             foreach (string uNote in unparsedNotes)
             {
                 string title = string.Empty;
                 string content = string.Empty;
 
-                if (uNote.StartsWith(TITLE_ID.ToString()))
+                if (uNote.StartsWith(TITLE_ID))
                 {
-                    title = uNote.Remove(0, TITLE_ID.ToString().Length);
-                    if (title.Contains(CONTENT_ID.ToString()))
-                        title = title[..title.IndexOf(CONTENT_ID.ToString())];
+                    title = uNote.Remove(0, TITLE_ID.Length);
+                    if (title.Contains(CONTENT_ID))
+                        title = title[..title.IndexOf(CONTENT_ID)];
                     else
-                        title = title[..title.IndexOf(SEPERATOR_ID.ToString())];
+                        title = title[..title.IndexOf(SEPERATOR_ID)];
                 }
-                if (uNote.Contains(CONTENT_ID.ToString()))
+                if (uNote.Contains(CONTENT_ID))
                 {
-                    content = uNote[uNote.IndexOf(CONTENT_ID.ToString())..];
-                    content = content.Remove(content.IndexOf(CONTENT_ID.ToString()), CONTENT_ID.ToString().Length);
+                    content = uNote[uNote.IndexOf(CONTENT_ID)..];
+                    content = content.Remove(content.IndexOf(CONTENT_ID), CONTENT_ID.Length);
                 }
 
                 AddNote(new Note(title, content));

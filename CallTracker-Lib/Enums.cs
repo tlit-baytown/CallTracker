@@ -67,7 +67,16 @@ namespace CallTracker_Lib.utility
             CallLogInsert,
             CallLogUpdate,
             CallLogDelete,
-            CallLogIncomplete
+            CallLogIncomplete,
+            CompanyInsert,
+            CompanyUpdate,
+            CompanyDelete,
+            CompanyIncomplete,
+            CompanyContactNull,
+            ContactInsert,
+            ContactUpdate,
+            ContactDelete,
+            ContactIncomplete
         }
 
         /// <summary>
@@ -191,31 +200,18 @@ namespace CallTracker_Lib.utility
     /// </summary>
     public static class EnumExtensions
     {
-        public static string ToDescriptionString(this States val)
+        public static string ToDescriptionString<T>(this T val) where T : Enum
         {
-            DescriptionAttribute[] attributes = (DescriptionAttribute[])val
-               .GetType()
-               .GetField(val.ToString())
-               .GetCustomAttributes(typeof(DescriptionAttribute), false);
-            return attributes.Length > 0 ? attributes[0].Description : string.Empty;
-        }
-
-        public static string ToDescriptionString(this DatabaseError val)
-        {
-            DescriptionAttribute[] attributes = (DescriptionAttribute[])val
-               .GetType()
-               .GetField(val.ToString())
-               .GetCustomAttributes(typeof(DescriptionAttribute), false);
-            return attributes.Length > 0 ? attributes[0].Description : string.Empty;
-        }
-
-        public static string ToDescriptionString(this ValidatorError val)
-        {
-            DescriptionAttribute[] attributes = (DescriptionAttribute[])val
-               .GetType()
-               .GetField(val.ToString())
-               .GetCustomAttributes(typeof(DescriptionAttribute), false);
-            return attributes.Length > 0 ? attributes[0].Description : string.Empty;
+            if (val == null)
+                return string.Empty;
+            try
+            {
+                DescriptionAttribute[] attributes = (DescriptionAttribute[])val
+                .GetType()
+                .GetField(val.ToString())
+                .GetCustomAttributes(typeof(DescriptionAttribute), false);
+                return attributes.Length > 0 ? attributes[0].Description : string.Empty;
+            } catch (Exception) { return string.Empty; }
         }
     }
 }

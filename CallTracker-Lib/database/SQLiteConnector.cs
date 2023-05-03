@@ -398,5 +398,374 @@ namespace CallTracker_Lib.database
             return affectedRows != 0;
         }
         #endregion
+
+        #region Company
+        public static int InsertCompany(Company c)
+        {
+            int affectedRows = 0;
+            ArrayList? columns = GetColumns("company");
+            if (columns == null)
+                return -1;
+            columns.RemoveAt(0); //remove the id column
+            columns.TrimToSize();
+
+            string q = Queries.BuildQuery(QType.INSERT, "company", null, columns);
+
+            using SQLiteConnection conn = new SQLiteConnection(DBConnection.GetConnectionString());
+            if (conn == null)
+                return -1;
+            conn.Open();
+
+            using (SQLiteTransaction tr = conn.BeginTransaction())
+            {
+                using SQLiteCommand cmd = new(q, conn, tr);
+                cmd.CommandType = CommandType.Text;
+
+                cmd.Parameters.AddWithValue("@0", c.Name);
+                cmd.Parameters.AddWithValue("@1", c.BusinessPhone);
+                cmd.Parameters.AddWithValue("@2", c.PrimaryContactID);
+                cmd.Parameters.AddWithValue("@3", c.AdditionalContacts);
+                cmd.Parameters.AddWithValue("@4", c.CompanyAddress?.ToDBString());
+                cmd.Parameters.AddWithValue("@5", c.WebsiteURL);
+                cmd.Parameters.AddWithValue("@6", c.Base64Logo);
+                cmd.Parameters.AddWithValue("@7", c.LinkedInURL);
+                cmd.Parameters.AddWithValue("@8", c.Industry);
+                cmd.Parameters.AddWithValue("@9", c.WorkforceSize);
+                affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows > 0)
+                    tr.Commit();
+                else
+                    tr.Rollback();
+            }
+
+            conn.Close();
+            return affectedRows != 0 ? GetLastRowIDInserted("company") : -1;
+        }
+
+        public static bool UpdateCompany(Company c)
+        {
+            int affectedRows = 0;
+            ArrayList? columns = GetColumns("company");
+            if (columns == null)
+                return false;
+            string q = Queries.BuildQuery(QType.UPDATE, "company", null, columns, $"id={c.ID}");
+
+            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            if (conn == null)
+                return false;
+            conn.Open();
+
+            using (SQLiteTransaction tr = conn.BeginTransaction())
+            {
+                using SQLiteCommand cmd = new(q, conn, tr);
+                cmd.CommandType = CommandType.Text;
+
+                cmd.Parameters.AddWithValue("@0", c.ID);
+                cmd.Parameters.AddWithValue("@1", c.Name);
+                cmd.Parameters.AddWithValue("@2", c.BusinessPhone);
+                cmd.Parameters.AddWithValue("@3", c.PrimaryContactID);
+                cmd.Parameters.AddWithValue("@4", c.AdditionalContacts);
+                cmd.Parameters.AddWithValue("@5", c.CompanyAddress?.ToDBString());
+                cmd.Parameters.AddWithValue("@6", c.WebsiteURL);
+                cmd.Parameters.AddWithValue("@7", c.Base64Logo);
+                cmd.Parameters.AddWithValue("@8", c.LinkedInURL);
+                cmd.Parameters.AddWithValue("@9", c.Industry);
+                cmd.Parameters.AddWithValue("@10", c.WorkforceSize);
+                affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows > 0)
+                    tr.Commit();
+                else
+                    tr.Rollback();
+            }
+
+            conn.Close();
+            return affectedRows != 0;
+        }
+
+        public static Company? GetCompany(int id)
+        {
+            Company? c = null;
+            string q = Queries.BuildQuery(QType.SELECT, "company", null, null, $"id={id}");
+
+            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            conn.Open();
+
+            using SQLiteCommand cmd = new(q, conn);
+            using SQLiteDataReader reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                reader.Read();
+                c = new Company
+                {
+                    ID = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    BusinessPhone = reader.GetString(2),
+                    PrimaryContactID = reader.GetInt32(3),
+                    AdditionalContacts = reader.GetString(4),
+                    CompanyAddress = new Address(reader.GetString(5)),
+                    WebsiteURL = reader.GetString(6),
+                    Base64Logo = reader.GetString(7),
+                    LinkedInURL = reader.GetString(8),
+                    Industry = reader.GetString(9),
+                    WorkforceSize = reader.GetInt32(10)
+                };
+                if (c.PrimaryContactID != 0)
+                    c.PrimaryContact = GetContact(c.PrimaryContactID);
+            }
+
+            conn.Close();
+            return c;
+        }
+
+        public static List<Company> GetCompanies()
+        {
+            List<Company> companies = new List<Company>();
+            string q = Queries.BuildQuery(QType.SELECT, "company");
+
+            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            conn.Open();
+
+            using SQLiteCommand cmd = new(q, conn);
+            using SQLiteDataReader reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    Company c = new Company
+                    {
+                        ID = reader.GetInt32(0),
+                        Name = reader.GetString(1),
+                        BusinessPhone = reader.GetString(2),
+                        PrimaryContactID = reader.GetInt32(3),
+                        AdditionalContacts = reader.GetString(4),
+                        CompanyAddress = new Address(reader.GetString(5)),
+                        WebsiteURL = reader.GetString(6),
+                        Base64Logo = reader.GetString(7),
+                        LinkedInURL = reader.GetString(8),
+                        Industry = reader.GetString(9),
+                        WorkforceSize = reader.GetInt32(10)
+                    };
+                    if (c.PrimaryContactID != 0)
+                        c.PrimaryContact = GetContact(c.PrimaryContactID);
+                    companies.Add(c);
+                }
+            }
+
+            conn.Close();
+            return companies;
+        }
+
+        public static bool DeleteCompany(Company c)
+        {
+            int affectedRows = 0;
+            string q = Queries.BuildQuery(QType.DELETE, "company", null, null, $"id={c.ID}");
+
+            try
+            {
+                using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+                conn.Open();
+                using (SQLiteTransaction tr = conn.BeginTransaction())
+                {
+                    using SQLiteCommand cmd = new(q, conn, tr);
+                    affectedRows = cmd.ExecuteNonQuery();
+                    if (affectedRows > 0)
+                        tr.Commit();
+                    else
+                        tr.Rollback();
+                }
+                conn.Close();
+
+                bool contactDeleteSuccess = DeleteContact(c.PrimaryContact);
+                if (!contactDeleteSuccess)
+                    return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return affectedRows != 0;
+        }
+        #endregion
+
+        #region Contact
+        public static int InsertContact(Contact c)
+        {
+            int affectedRows = 0;
+            ArrayList? columns = GetColumns("contact");
+            if (columns == null)
+                return -1;
+            columns.RemoveAt(0); //remove the id column
+            columns.TrimToSize();
+
+            string q = Queries.BuildQuery(QType.INSERT, "contact", null, columns);
+
+            using SQLiteConnection conn = new SQLiteConnection(DBConnection.GetConnectionString());
+            if (conn == null)
+                return -1;
+            conn.Open();
+
+            using (SQLiteTransaction tr = conn.BeginTransaction())
+            {
+                using SQLiteCommand cmd = new(q, conn, tr);
+                cmd.CommandType = CommandType.Text;
+
+                cmd.Parameters.AddWithValue("@0", c.FirstName);
+                cmd.Parameters.AddWithValue("@1", c.LastName);
+                cmd.Parameters.AddWithValue("@2", c.Title);
+                cmd.Parameters.AddWithValue("@3", c.PhoneNumber);
+                cmd.Parameters.AddWithValue("@4", c.MobilePhone);
+                cmd.Parameters.AddWithValue("@5", c.Email);
+                cmd.Parameters.AddWithValue("@6", c.SecondaryEmail);
+                cmd.Parameters.AddWithValue("@7", c.IsDecisionMaker);
+                affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows > 0)
+                    tr.Commit();
+                else
+                    tr.Rollback();
+            }
+
+            conn.Close();
+            return affectedRows != 0 ? GetLastRowIDInserted("contact") : -1;
+        }
+
+        public static bool UpdateContact(Contact c)
+        {
+            int affectedRows = 0;
+            ArrayList? columns = GetColumns("contact");
+            if (columns == null)
+                return false;
+            string q = Queries.BuildQuery(QType.UPDATE, "contact", null, columns, $"id={c.ID}");
+
+            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            if (conn == null)
+                return false;
+            conn.Open();
+
+            using (SQLiteTransaction tr = conn.BeginTransaction())
+            {
+                using SQLiteCommand cmd = new(q, conn, tr);
+                cmd.CommandType = CommandType.Text;
+
+                cmd.Parameters.AddWithValue("@0", c.ID);
+                cmd.Parameters.AddWithValue("@1", c.FirstName);
+                cmd.Parameters.AddWithValue("@2", c.LastName);
+                cmd.Parameters.AddWithValue("@3", c.Title);
+                cmd.Parameters.AddWithValue("@4", c.PhoneNumber);
+                cmd.Parameters.AddWithValue("@5", c.MobilePhone);
+                cmd.Parameters.AddWithValue("@6", c.Email);
+                cmd.Parameters.AddWithValue("@7", c.SecondaryEmail);
+                cmd.Parameters.AddWithValue("@8", c.IsDecisionMaker);
+                affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows > 0)
+                    tr.Commit();
+                else
+                    tr.Rollback();
+            }
+
+            conn.Close();
+            return affectedRows != 0;
+        }
+
+        public static Contact? GetContact(int id)
+        {
+            Contact? c = null;
+            string q = Queries.BuildQuery(QType.SELECT, "contact", null, null, $"id={id}");
+
+            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            conn.Open();
+
+            using SQLiteCommand cmd = new(q, conn);
+            using SQLiteDataReader reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                reader.Read();
+                c = new Contact
+                {
+                    ID = reader.GetInt32(0),
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    Title = reader.GetString(3),
+                    PhoneNumber = reader.GetString(4),
+                    MobilePhone = reader.GetString(5),
+                    Email = reader.GetString(6),
+                    SecondaryEmail = reader.GetString(7),
+                    IsDecisionMaker = reader.GetBoolean(8)
+                };
+            }
+
+            conn.Close();
+            return c;
+        }
+
+        public static List<Contact> GetContactsForCompany(int companyID)
+        {
+            throw new NotImplementedException();
+            //List<Company> companies = new List<Company>();
+            //string q = Queries.BuildQuery(QType.SELECT, "company");
+
+            //using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            //conn.Open();
+
+            //using SQLiteCommand cmd = new(q, conn);
+            //using SQLiteDataReader reader = cmd.ExecuteReader();
+            //if (reader.HasRows)
+            //{
+            //    while (reader.Read())
+            //    {
+            //        Company c = new Company
+            //        {
+            //            ID = reader.GetInt32(0),
+            //            Name = reader.GetString(1),
+            //            BusinessPhone = reader.GetString(2),
+            //            PrimaryContactID = reader.GetInt32(3),
+            //            AdditionalContacts = reader.GetString(4),
+            //            CompanyAddress = new Address(reader.GetString(5)),
+            //            WebsiteURL = reader.GetString(6),
+            //            Base64Logo = reader.GetString(7),
+            //            LinkedInURL = reader.GetString(8),
+            //            Industry = reader.GetString(9),
+            //            WorkforceSize = reader.GetInt32(10)
+            //        };
+            //        if (c.PrimaryContactID != 0)
+            //            c.PrimaryContact = GetContact(c.PrimaryContactID);
+            //        companies.Add(c);
+            //    }
+            //}
+
+            //conn.Close();
+            //return companies;
+        }
+
+        public static bool DeleteContact(Contact c)
+        {
+            int affectedRows = 0;
+            string q = Queries.BuildQuery(QType.DELETE, "contact", null, null, $"id={c.ID}");
+
+            try
+            {
+                using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+                conn.Open();
+                using (SQLiteTransaction tr = conn.BeginTransaction())
+                {
+                    using SQLiteCommand cmd = new(q, conn, tr);
+                    affectedRows = cmd.ExecuteNonQuery();
+                    if (affectedRows > 0)
+                        tr.Commit();
+                    else
+                        tr.Rollback();
+                }
+                conn.Close();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return affectedRows != 0;
+        }
+        #endregion
     }
 }
