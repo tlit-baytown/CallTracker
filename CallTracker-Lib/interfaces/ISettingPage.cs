@@ -20,7 +20,7 @@ namespace CallTracker_Lib.interfaces
         /// <summary>
         /// Indicates if the settings have been unchanged and thus do not need saving.
         /// </summary>
-        public bool SettingsUnchanged { get; set; }
+        public bool SettingsChanged { get; set; }
 
         /// <summary>
         /// Defines behavior for saving settings either to disk or to the Settings.resx file.

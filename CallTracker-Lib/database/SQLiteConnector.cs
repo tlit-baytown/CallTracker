@@ -84,159 +84,6 @@ namespace CallTracker_Lib.database
             return lastRowID;
         }
 
-        #region AppOwner
-        public static int InsertAppOwner(AppOwner owner)
-        {
-            int affectedRows = 0;
-            ArrayList? columns = GetColumns("app_owner");
-            if (columns == null)
-                return -1;
-            columns.RemoveAt(0); //remove the id column
-            columns.TrimToSize();
-
-            string q = Queries.BuildQuery(QType.INSERT, "app_owner", null, columns);
-
-            using SQLiteConnection conn = new SQLiteConnection(DBConnection.GetConnectionString());
-            if (conn == null)
-                return -1;
-            conn.Open();
-
-            using (SQLiteTransaction tr = conn.BeginTransaction())
-            {
-                using SQLiteCommand cmd = new(q, conn, tr);
-                cmd.CommandType = CommandType.Text;
-
-                cmd.Parameters.AddWithValue("@0", owner.Name);
-                cmd.Parameters.AddWithValue("@1", owner.Base64Logo);
-                cmd.Parameters.AddWithValue("@2", owner.PhoneNumber);
-                affectedRows = cmd.ExecuteNonQuery();
-
-                if (affectedRows > 0)
-                    tr.Commit();
-                else
-                    tr.Rollback();
-            }
-
-            conn.Close();
-            return affectedRows != 0 ? GetLastRowIDInserted("app_owner") : -1;
-        }
-
-        public static bool UpdateAppOwner(AppOwner owner)
-        {
-            int affectedRows = 0;
-            ArrayList? columns = GetColumns("app_owner");
-            if (columns == null)
-                return false;
-            string q = Queries.BuildQuery(QType.UPDATE, "app_owner", null, columns, $"id={owner.ID}");
-
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
-            if (conn == null)
-                return false;
-            conn.Open();
-
-            using (SQLiteTransaction tr = conn.BeginTransaction())
-            {
-                using SQLiteCommand cmd = new(q, conn, tr);
-                cmd.CommandType = CommandType.Text;
-
-                cmd.Parameters.AddWithValue("@0", owner.ID);
-                cmd.Parameters.AddWithValue("@1", owner.Name);
-                cmd.Parameters.AddWithValue("@2", owner.Base64Logo);
-                cmd.Parameters.AddWithValue("@3", owner.PhoneNumber);
-                affectedRows = cmd.ExecuteNonQuery();
-
-                if (affectedRows > 0)
-                    tr.Commit();
-                else
-                    tr.Rollback();
-            }
-
-            conn.Close();
-            return affectedRows != 0;
-        }
-
-        public static AppOwner? GetAppOwner(int id)
-        {
-            AppOwner? owner = null;
-            string q = Queries.BuildQuery(QType.SELECT, "app_owner", null, null, $"id={id}");
-
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
-            conn.Open();
-
-            using SQLiteCommand cmd = new(q, conn);
-            using SQLiteDataReader reader = cmd.ExecuteReader();
-            if (reader.HasRows)
-            {
-                reader.Read();
-                owner = new AppOwner
-                {
-                    ID = reader.GetInt32(0),
-                    Name = reader.GetString(1),
-                    Base64Logo = reader.GetString(2),
-                    PhoneNumber = reader.GetString(3)
-                };
-            }
-
-            conn.Close();
-            return owner;
-        }
-
-        public static List<AppOwner> GetAppOwners()
-        {
-            List<AppOwner> appOwners = new List<AppOwner>();
-            string q = Queries.BuildQuery(QType.SELECT, "app_owner");
-
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
-            conn.Open();
-
-            using SQLiteCommand cmd = new(q, conn);
-            using SQLiteDataReader reader = cmd.ExecuteReader();
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    AppOwner owner = new AppOwner
-                    {
-                        ID = reader.GetInt32(0),
-                        Name = reader.GetString(1),
-                        Base64Logo = reader.GetString(2),
-                        PhoneNumber = reader.GetString(3)
-                    };
-                    appOwners.Add(owner);
-                }
-            }
-
-            conn.Close();
-            return appOwners;
-        }
-
-        public static bool DeleteAppOwner(AppOwner owner)
-        {
-            int affectedRows = 0;
-            string q = Queries.BuildQuery(QType.DELETE, "app_owner", null, null, $"id={owner.ID}");
-
-            try
-            {
-                using SQLiteConnection conn = new(DBConnection.GetConnectionString());
-                conn.Open();
-                using (SQLiteTransaction tr = conn.BeginTransaction())
-                {
-                    using SQLiteCommand cmd = new(q, conn, tr);
-                    affectedRows = cmd.ExecuteNonQuery();
-                    if (affectedRows > 0)
-                        tr.Commit();
-                    else
-                        tr.Rollback();
-                }
-                conn.Close();
-            } catch (Exception)
-            {
-                return false;
-            }
-            return affectedRows != 0;
-        }
-        #endregion
-
         #region Call Log
         public static int InsertCallLog(CallLog log)
         {
@@ -271,9 +118,36 @@ namespace CallTracker_Lib.database
                 else
                     tr.Rollback();
             }
+            conn.Close();
+
+            UpdateCompanyCalls(log);
+            return affectedRows != 0 ? GetLastRowIDInserted("call_log") : -1;
+        }
+
+        private static bool UpdateCompanyCalls(CallLog log)
+        {
+            string q = $"UPDATE company_calls SET number_of_calls_made = number_of_calls_made + 1 WHERE company_id={log.CompanyID}";
+            int affectedRows = 0;
+
+            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            if (conn == null)
+                return false;
+            conn.Open();
+
+            using (SQLiteTransaction tr = conn.BeginTransaction())
+            {
+                using SQLiteCommand cmd = new(q, conn, tr);
+                cmd.CommandType = CommandType.Text;
+                affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows > 0)
+                    tr.Commit();
+                else
+                    tr.Rollback();
+            }
 
             conn.Close();
-            return affectedRows != 0 ? GetLastRowIDInserted("call_log") : -1;
+            return affectedRows != 0;
         }
 
         public static bool UpdateCallLog(CallLog log)
@@ -440,7 +314,45 @@ namespace CallTracker_Lib.database
             }
 
             conn.Close();
-            return affectedRows != 0 ? GetLastRowIDInserted("company") : -1;
+            int lastRowID = -1;
+            if (affectedRows > 0)
+            {
+                //Create entry for company in company_calls table
+                lastRowID = GetLastRowIDInserted("company");
+                InsertCompanyCallRecord(lastRowID);
+            }
+
+            return lastRowID;
+        }
+        /// <summary>
+        /// Create the initial call record for the specified company ID.
+        /// </summary>
+        /// <param name="companyID">The id of the company this record pertains to.</param>
+        /// <returns></returns>
+        private static bool InsertCompanyCallRecord(int companyID)
+        {
+            string q = $"INSERT INTO company_calls(company_id, number_of_calls_made) VALUES({companyID}, 0);";
+            int affectedRows = 0;
+
+            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            if (conn == null)
+                return false;
+            conn.Open();
+
+            using (SQLiteTransaction tr = conn.BeginTransaction())
+            {
+                using SQLiteCommand cmd = new(q, conn, tr);
+                cmd.CommandType = CommandType.Text;
+                affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows > 0)
+                    tr.Commit();
+                else
+                    tr.Rollback();
+            }
+
+            conn.Close();
+            return affectedRows != 0;
         }
 
         public static bool UpdateCompany(Company c)

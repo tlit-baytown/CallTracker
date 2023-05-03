@@ -7,25 +7,15 @@ namespace CallTracker_Lib.database
 {
     public class DBConnection
     {
-        private readonly NLog.Logger Logger = LogManager<DBConnection>.GetLogger();
+        private static readonly NLog.Logger Logger = LogManager<DBConnection>.GetLogger();
 
-        private SQLiteConnection? _sqlite = null;
+        private static SQLiteConnection? _sqlite = null;
         private static string? _connectionString;
+        private static bool _lastConnectionSuccessful = false;
 
-        private static bool _lastConnectionSuccessfull = false;
+        private DBConnection() { }
 
-        public DBConnection(string connectionString)
-        {
-            _connectionString = connectionString;
-            CreateConnection();
-        }
-
-        public SQLiteConnection? CreateConnection()
-        {
-            return CreateConnection(_connectionString);
-        }
-
-        public SQLiteConnection? CreateConnection(string connectionString)
+        public static SQLiteConnection? CreateConnection(string connectionString)
         {
             _connectionString = connectionString;
 
@@ -33,12 +23,12 @@ namespace CallTracker_Lib.database
             try
             {
                 _sqlite.Open();
-                _lastConnectionSuccessfull = true;
+                _lastConnectionSuccessful = true;
             }
             catch (Exception)
             {
                 Logger.Log(NLog.LogLevel.Fatal, "The SQLite connection could not be opened. Check the file path and try again.");
-                _lastConnectionSuccessfull = false;
+                _lastConnectionSuccessful = false;
                 return null;
             }
             finally
@@ -49,11 +39,11 @@ namespace CallTracker_Lib.database
             return _sqlite;
         }
 
-        public static bool IsConnected() { return _lastConnectionSuccessfull; }
+        public static bool IsConnected() { return _lastConnectionSuccessful; }
 
         public static string CreateConnectionString(string filePath)
         {
-            StringBuilder bldr = new StringBuilder();
+            StringBuilder bldr = new();
             bldr = bldr.Append("Data Source=").Append(filePath).Append(";Version=3;Pooling=True;Max Pool Size=100;DateTimeFormat=Ticks;");
             return bldr.ToString();
         }
@@ -66,19 +56,20 @@ namespace CallTracker_Lib.database
         /// <returns>True: the file was created or already existed. False: the file could not be created or did not exist.</returns>
         public static bool TouchFile(string connectionString)
         {
-            SQLiteConnection conn = new SQLiteConnection(connectionString);
-            try
-            {
-                conn.Open();
-            }
-            catch (Exception) {
-                conn.Close();
-                return false;
-            }
-            finally { conn.Close(); }
+            CreateConnection(connectionString);
+            return _lastConnectionSuccessful;
+        }
 
-            _connectionString = connectionString;
-            return true;
+        /// <summary>
+        /// Opens and then immediatly closes a connection on the given connection string. 
+        /// This allows the file to be created if it doesn't already exist or verified that it can be opened.
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <returns>True: the file was created or already existed. False: the file could not be created or did not exist.</returns>
+        public static bool TouchFileWithPath(string filePath)
+        {
+            string connectionString = CreateConnectionString(filePath);
+            return TouchFile(connectionString);
         }
 
         public static string? GetConnectionString()

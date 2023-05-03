@@ -17,7 +17,7 @@ namespace CallTracker_GUI.user_controls
     public partial class DBSetupUsrCtl : UserControl, ISettingPage
     {
         public string UniqueName { get => "db_setup"; }
-        public bool SettingsUnchanged { get; set; } = true;
+        public bool SettingsChanged { get; set; } = false;
 
         private string _dbPath = string.Empty;
         private string _connectString = string.Empty;
@@ -45,13 +45,20 @@ namespace CallTracker_GUI.user_controls
                 _dbPath = Settings.Default.DBPath;
                 lblDBPath.Text = _dbPath;
                 _connectionSuccessful = DBConnection.TouchFile(Settings.Default.ConnectionString);
+
+                if (!_connectionSuccessful)
+                    MessageBox.Show(this, "The database file could not be opened or read from.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             SetButtons();
         }
 
         public void ResetSettings()
         {
-            throw new NotImplementedException();
+            lblDBPath.Text = "No Database Found";
+            _dbPath = string.Empty;
+            _connectString = string.Empty;
+            _connectionSuccessful = false;
+            SetButtons();
         }
 
         public void SaveSettings()
@@ -59,17 +66,26 @@ namespace CallTracker_GUI.user_controls
             Settings.Default.DBPath = _dbPath;
             Settings.Default.ConnectionString = _connectString;
             Settings.Default.Save();
+            SettingsChanged = false;
         }
 
         private void CreateDBBtn_Click(object sender, EventArgs e)
         {
             if (FileDlgSaveDB.ShowDialog() == DialogResult.OK)
             {
-                _connectionSuccessful = CreateOrOpenDatabase(FileDlgSaveDB.FileName);
+                _dbPath = FileDlgSaveDB.FileName;
+                _connectionSuccessful = DBConnection.TouchFileWithPath(_dbPath);
+
                 if (!_connectionSuccessful)
                     MessageBox.Show(this, "The database file could not be saved.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
-                    SettingsUnchanged = false;
+                {
+                    lblDBPath.Text = _dbPath;
+                    _connectString = DBConnection.CreateConnectionString(_dbPath);
+                    SettingsChanged = true;
+
+                    //TODO: Actually create the db schema in the empty file.
+                }
             }
             SetButtons();
         }
@@ -78,21 +94,20 @@ namespace CallTracker_GUI.user_controls
         {
             if (FileDlgOpenDB.ShowDialog() == DialogResult.OK)
             {
-                _connectionSuccessful = CreateOrOpenDatabase(FileDlgOpenDB.FileName);
+                _dbPath = FileDlgOpenDB.FileName;
+                _connectionSuccessful = DBConnection.TouchFileWithPath(_dbPath);
+
                 if (!_connectionSuccessful)
                     MessageBox.Show(this, "The database file could not be opened or read from.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
-                    SettingsUnchanged = false;
+                {
+                    lblDBPath.Text = _dbPath;
+                    _connectString = DBConnection.CreateConnectionString(_dbPath);
+                    Settings.Default.ConnectionString = _connectString;
+                    SettingsChanged = true;
+                }
             }
             SetButtons();
-        }
-
-        private bool CreateOrOpenDatabase(string fileName)
-        {
-            _dbPath = fileName;
-            _connectString = DBConnection.CreateConnectionString(fileName);
-            lblDBPath.Text = _dbPath;
-            return DBConnection.TouchFile(_connectString); //test and make sure the connection could be created.
         }
 
         private void CloseDBBtn_Click(object sender, EventArgs e)
@@ -105,6 +120,7 @@ namespace CallTracker_GUI.user_controls
                 _connectString = string.Empty;
                 lblDBPath.Text = "No Database Found.";
                 _connectionSuccessful = false;
+                SettingsChanged = true;
             }
             SetButtons();
         }

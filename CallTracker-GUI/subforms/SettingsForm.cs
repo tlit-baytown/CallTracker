@@ -1,4 +1,5 @@
 ﻿using CallTracker_GUI.user_controls;
+using CallTracker_Lib.database;
 using CallTracker_Lib.interfaces;
 using CallTracker_Lib.logging;
 using System;
@@ -19,7 +20,7 @@ namespace CallTracker_GUI.subforms
 
         private List<ISettingPage> settingPages = new List<ISettingPage>
         {
-            new DBSetupUsrCtl(), new CompanySetupUsrCtl()
+            new DBSetupUsrCtl()
         };
 
         public SettingsForm()
@@ -29,18 +30,17 @@ namespace CallTracker_GUI.subforms
 
         private void SettingsForm_Load(object sender, EventArgs e)
         {
-            TabPageDBSettings.Controls.Add(settingPages.Find(n => n.UniqueName.Equals("db_setup")) as UserControl);
-            TabPageCompanySettings.Controls.Add(settingPages.Find(n => n.UniqueName.Equals("comp_settings")) as UserControl);
+            Controls.Add(settingPages.Find(n => n.UniqueName.Equals("db_setup")) as UserControl);
         }
 
         private void SaveSettingsBtn_Click(object sender, EventArgs e)
         {
             foreach (ISettingPage settingPage in settingPages)
             {
-                if (!settingPage.SettingsUnchanged)
+                if (settingPage.SettingsChanged)
                 {
                     settingPage.SaveSettings();
-                    settingPage.SettingsUnchanged = true;
+                    settingPage.SettingsChanged = false;
                 }
             }
             MessageBox.Show(this, "Settings Saved!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -78,8 +78,8 @@ namespace CallTracker_GUI.subforms
         {
             bool changesPending = false;
             foreach (ISettingPage settingPage in settingPages)
-                if (settingPage.SettingsUnchanged == false)
-                    changesPending = true;
+                changesPending = settingPage.SettingsChanged;
+                    
             if (changesPending)
             {
                 DialogResult response = MessageBox.Show(this, "There are changes pending to the settings. Are you sure you want to cancel?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
