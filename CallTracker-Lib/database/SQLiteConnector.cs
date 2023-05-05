@@ -8,43 +8,38 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CallTracker_Lib.utility.Enums;
+using static CallTracker_Lib.Enums;
 
 namespace CallTracker_Lib.database
 {
-    public class SQLiteConnector
+    public sealed class SqLiteConnector
     {
-        private static readonly NLog.Logger Logger = logging.LogManager<SQLiteConnector>.GetLogger();
-
-        private SQLiteConnector() { }
+        private static readonly NLog.Logger Logger = logging.LogManager<SqLiteConnector>.GetLogger();
 
         /// <summary>
         /// Retrieve a list of column names from the specified table.
         /// </summary>
         /// <param name="tableName">The table to get the columns of</param>
         /// <returns>An <see cref="ArrayList"/> of type <see cref="string"/> containing the column names or <c>null</c> if an error occured reading table.</returns>
-        public static ArrayList? GetColumns(string tableName)
+        private static ArrayList? GetColumns(string tableName)
         {
             SQLiteConnection conn;
-            ArrayList columns = new ArrayList();
-            string q = $"SELECT GROUP_CONCAT(NAME,',') FROM PRAGMA_TABLE_INFO('{tableName}')";
+            var columns = new ArrayList();
+            var q = $"SELECT GROUP_CONCAT(NAME,',') FROM PRAGMA_TABLE_INFO('{tableName}')";
 
-            using (conn = new SQLiteConnection(DBConnection.GetConnectionString()))
+            using (conn = new SQLiteConnection(DbConnection.GetConnectionString()))
             {
-                if (conn == null)
-                    return null;
-
                 conn.Open();
-                using (SQLiteCommand cmd = conn.CreateCommand())
+                using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = q;
-                    using SQLiteDataReader reader = cmd.ExecuteReader();
+                    using var reader = cmd.ExecuteReader();
                     if (reader.HasRows)
                     {
                         reader.Read();
-                        string columnlist = reader.GetString(0);
-                        string[] tokens = columnlist.Split(',');
-                        foreach (string str in tokens)
+                        var columnlist = reader.GetString(0);
+                        var tokens = columnlist.Split(',');
+                        foreach (var str in tokens)
                             columns.Add(str);
                     }
                 }
@@ -53,17 +48,17 @@ namespace CallTracker_Lib.database
             }
         }
 
-        public static int GetLastRowIDInserted(string tableName)
+        public static int GetLastRowIdInserted(string tableName)
         {
             SQLiteConnection conn;
 
-            int lastRowID = 0;
+            int lastRowId = 0;
             ArrayList? columns = GetColumns(tableName);
             string q = $"SELECT seq FROM sqlite_sequence WHERE name='{tableName}'";
             if (columns == null)
                 return 0;
 
-            using (conn = new SQLiteConnection(DBConnection.GetConnectionString()))
+            using (conn = new SQLiteConnection(DbConnection.GetConnectionString()))
             {
                 if (conn == null)
                     return -1;
@@ -75,13 +70,13 @@ namespace CallTracker_Lib.database
                     if (reader.HasRows)
                     {
                         reader.Read();
-                        lastRowID = reader.GetInt32(0);
+                        lastRowId = reader.GetInt32(0);
                     }
                 }
                 conn.Close();
             }
 
-            return lastRowID;
+            return lastRowId;
         }
 
         #region Call Log
@@ -96,7 +91,7 @@ namespace CallTracker_Lib.database
 
             string q = Queries.BuildQuery(QType.INSERT, "call_log", null, columns);
 
-            using SQLiteConnection conn = new SQLiteConnection(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new SQLiteConnection(DbConnection.GetConnectionString());
             if (conn == null)
                 return -1;
             conn.Open();
@@ -106,7 +101,7 @@ namespace CallTracker_Lib.database
                 using SQLiteCommand cmd = new(q, conn, tr);
                 cmd.CommandType = CommandType.Text;
 
-                cmd.Parameters.AddWithValue("@0", log.CompanyID);
+                cmd.Parameters.AddWithValue("@0", log.CompanyId);
                 cmd.Parameters.AddWithValue("@1", log.NoteManager == null ? string.Empty : log.NoteManager.ToString());
                 cmd.Parameters.AddWithValue("@2", log.NextCallDate.Ticks);
                 cmd.Parameters.AddWithValue("@3", log.LastCallDate.Ticks);
@@ -121,15 +116,15 @@ namespace CallTracker_Lib.database
             conn.Close();
 
             UpdateCompanyCalls(log);
-            return affectedRows != 0 ? GetLastRowIDInserted("call_log") : -1;
+            return affectedRows != 0 ? GetLastRowIdInserted("call_log") : -1;
         }
 
         private static bool UpdateCompanyCalls(CallLog log)
         {
-            string q = $"UPDATE company_calls SET number_of_calls_made = number_of_calls_made + 1 WHERE company_id={log.CompanyID}";
+            string q = $"UPDATE company_calls SET number_of_calls_made = number_of_calls_made + 1 WHERE company_id={log.CompanyId}";
             int affectedRows = 0;
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             if (conn == null)
                 return false;
             conn.Open();
@@ -156,9 +151,9 @@ namespace CallTracker_Lib.database
             ArrayList? columns = GetColumns("call_log");
             if (columns == null)
                 return false;
-            string q = Queries.BuildQuery(QType.UPDATE, "call_log", null, columns, $"id={log.ID}");
+            string q = Queries.BuildQuery(QType.UPDATE, "call_log", null, columns, $"id={log.Id}");
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             if (conn == null)
                 return false;
             conn.Open();
@@ -168,8 +163,8 @@ namespace CallTracker_Lib.database
                 using SQLiteCommand cmd = new(q, conn, tr);
                 cmd.CommandType = CommandType.Text;
 
-                cmd.Parameters.AddWithValue("@0", log.ID);
-                cmd.Parameters.AddWithValue("@1", log.CompanyID);
+                cmd.Parameters.AddWithValue("@0", log.Id);
+                cmd.Parameters.AddWithValue("@1", log.CompanyId);
                 cmd.Parameters.AddWithValue("@2", log.NoteManager == null ? string.Empty : log.NoteManager.ToString());
                 cmd.Parameters.AddWithValue("@3", log.NextCallDate.Ticks);
                 cmd.Parameters.AddWithValue("@4", log.LastCallDate.Ticks);
@@ -191,7 +186,7 @@ namespace CallTracker_Lib.database
             CallLog? log = null;
             string q = Queries.BuildQuery(QType.SELECT, "call_log", null, null, $"id={id}");
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             conn.Open();
 
             using SQLiteCommand cmd = new(q, conn);
@@ -201,8 +196,8 @@ namespace CallTracker_Lib.database
                 reader.Read();
                 log = new CallLog
                 {
-                    ID = reader.GetInt32(0),
-                    CompanyID = reader.GetInt32(1),
+                    Id = reader.GetInt32(0),
+                    CompanyId = reader.GetInt32(1),
                     NoteManager = new NoteManager(reader.GetString(2)),
                     NextCallDate = new DateTime(int.Parse(reader.GetString(3))),
                     LastCallDate = new DateTime(int.Parse(reader.GetString(4))),
@@ -219,7 +214,7 @@ namespace CallTracker_Lib.database
             List<CallLog> logs = new List<CallLog>();
             string q = Queries.BuildQuery(QType.SELECT, "call_log");
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             conn.Open();
 
             using SQLiteCommand cmd = new(q, conn);
@@ -230,8 +225,8 @@ namespace CallTracker_Lib.database
                 {
                     CallLog log = new CallLog
                         {
-                            ID = reader.GetInt32(0),
-                            CompanyID = reader.GetInt32(1),
+                            Id = reader.GetInt32(0),
+                            CompanyId = reader.GetInt32(1),
                             NoteManager = new NoteManager(reader.GetString(2)),
                             NextCallDate = new DateTime(int.Parse(reader.GetString(3))),
                             LastCallDate = new DateTime(int.Parse(reader.GetString(4))),
@@ -248,11 +243,11 @@ namespace CallTracker_Lib.database
         public static bool DeleteCallLog(CallLog log)
         {
             int affectedRows = 0;
-            string q = Queries.BuildQuery(QType.DELETE, "call_log", null, null, $"id={log.ID}");
+            string q = Queries.BuildQuery(QType.DELETE, "call_log", null, null, $"id={log.Id}");
 
             try
             {
-                using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+                using SQLiteConnection conn = new(DbConnection.GetConnectionString());
                 conn.Open();
                 using (SQLiteTransaction tr = conn.BeginTransaction())
                 {
@@ -285,7 +280,7 @@ namespace CallTracker_Lib.database
 
             string q = Queries.BuildQuery(QType.INSERT, "company", null, columns);
 
-            using SQLiteConnection conn = new SQLiteConnection(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new SQLiteConnection(DbConnection.GetConnectionString());
             if (conn == null)
                 return -1;
             conn.Open();
@@ -297,12 +292,12 @@ namespace CallTracker_Lib.database
 
                 cmd.Parameters.AddWithValue("@0", c.Name);
                 cmd.Parameters.AddWithValue("@1", c.BusinessPhone);
-                cmd.Parameters.AddWithValue("@2", c.PrimaryContactID);
+                cmd.Parameters.AddWithValue("@2", c.PrimaryContactId);
                 cmd.Parameters.AddWithValue("@3", c.AdditionalContacts);
-                cmd.Parameters.AddWithValue("@4", c.CompanyAddress?.ToDBString());
-                cmd.Parameters.AddWithValue("@5", c.WebsiteURL);
+                cmd.Parameters.AddWithValue("@4", c.CompanyAddress?.ToDbString());
+                cmd.Parameters.AddWithValue("@5", c.WebsiteUrl);
                 cmd.Parameters.AddWithValue("@6", c.Base64Logo);
-                cmd.Parameters.AddWithValue("@7", c.LinkedInURL);
+                cmd.Parameters.AddWithValue("@7", c.LinkedInUrl);
                 cmd.Parameters.AddWithValue("@8", c.Industry);
                 cmd.Parameters.AddWithValue("@9", c.WorkforceSize);
                 affectedRows = cmd.ExecuteNonQuery();
@@ -314,27 +309,27 @@ namespace CallTracker_Lib.database
             }
 
             conn.Close();
-            int lastRowID = -1;
+            int lastRowId = -1;
             if (affectedRows > 0)
             {
                 //Create entry for company in company_calls table
-                lastRowID = GetLastRowIDInserted("company");
-                InsertCompanyCallRecord(lastRowID);
+                lastRowId = GetLastRowIdInserted("company");
+                InsertCompanyCallRecord(lastRowId);
             }
 
-            return lastRowID;
+            return lastRowId;
         }
         /// <summary>
         /// Create the initial call record for the specified company ID.
         /// </summary>
-        /// <param name="companyID">The id of the company this record pertains to.</param>
+        /// <param name="companyId">The id of the company this record pertains to.</param>
         /// <returns></returns>
-        private static bool InsertCompanyCallRecord(int companyID)
+        private static bool InsertCompanyCallRecord(int companyId)
         {
-            string q = $"INSERT INTO company_calls(company_id, number_of_calls_made) VALUES({companyID}, 0);";
+            string q = $"INSERT INTO company_calls(company_id, number_of_calls_made) VALUES({companyId}, 0);";
             int affectedRows = 0;
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             if (conn == null)
                 return false;
             conn.Open();
@@ -361,9 +356,9 @@ namespace CallTracker_Lib.database
             ArrayList? columns = GetColumns("company");
             if (columns == null)
                 return false;
-            string q = Queries.BuildQuery(QType.UPDATE, "company", null, columns, $"id={c.ID}");
+            string q = Queries.BuildQuery(QType.UPDATE, "company", null, columns, $"id={c.Id}");
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             if (conn == null)
                 return false;
             conn.Open();
@@ -373,15 +368,15 @@ namespace CallTracker_Lib.database
                 using SQLiteCommand cmd = new(q, conn, tr);
                 cmd.CommandType = CommandType.Text;
 
-                cmd.Parameters.AddWithValue("@0", c.ID);
+                cmd.Parameters.AddWithValue("@0", c.Id);
                 cmd.Parameters.AddWithValue("@1", c.Name);
                 cmd.Parameters.AddWithValue("@2", c.BusinessPhone);
-                cmd.Parameters.AddWithValue("@3", c.PrimaryContactID);
+                cmd.Parameters.AddWithValue("@3", c.PrimaryContactId);
                 cmd.Parameters.AddWithValue("@4", c.AdditionalContacts);
-                cmd.Parameters.AddWithValue("@5", c.CompanyAddress?.ToDBString());
-                cmd.Parameters.AddWithValue("@6", c.WebsiteURL);
+                cmd.Parameters.AddWithValue("@5", c.CompanyAddress?.ToDbString());
+                cmd.Parameters.AddWithValue("@6", c.WebsiteUrl);
                 cmd.Parameters.AddWithValue("@7", c.Base64Logo);
-                cmd.Parameters.AddWithValue("@8", c.LinkedInURL);
+                cmd.Parameters.AddWithValue("@8", c.LinkedInUrl);
                 cmd.Parameters.AddWithValue("@9", c.Industry);
                 cmd.Parameters.AddWithValue("@10", c.WorkforceSize);
                 affectedRows = cmd.ExecuteNonQuery();
@@ -401,7 +396,7 @@ namespace CallTracker_Lib.database
             Company? c = null;
             string q = Queries.BuildQuery(QType.SELECT, "company", null, null, $"id={id}");
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             conn.Open();
 
             using SQLiteCommand cmd = new(q, conn);
@@ -411,20 +406,20 @@ namespace CallTracker_Lib.database
                 reader.Read();
                 c = new Company
                 {
-                    ID = reader.GetInt32(0),
+                    Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
                     BusinessPhone = reader.GetString(2),
-                    PrimaryContactID = reader.GetInt32(3),
+                    PrimaryContactId = reader.GetInt32(3),
                     AdditionalContacts = reader.GetString(4),
                     CompanyAddress = new Address(reader.GetString(5)),
-                    WebsiteURL = reader.GetString(6),
+                    WebsiteUrl = reader.GetString(6),
                     Base64Logo = reader.GetString(7),
-                    LinkedInURL = reader.GetString(8),
+                    LinkedInUrl = reader.GetString(8),
                     Industry = reader.GetString(9),
                     WorkforceSize = reader.GetInt32(10)
                 };
-                if (c.PrimaryContactID != 0)
-                    c.PrimaryContact = GetContact(c.PrimaryContactID);
+                if (c.PrimaryContactId != 0)
+                    c.PrimaryContact = GetContact(c.PrimaryContactId);
             }
 
             conn.Close();
@@ -436,7 +431,7 @@ namespace CallTracker_Lib.database
             List<Company> companies = new List<Company>();
             string q = Queries.BuildQuery(QType.SELECT, "company");
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             conn.Open();
 
             using SQLiteCommand cmd = new(q, conn);
@@ -447,20 +442,20 @@ namespace CallTracker_Lib.database
                 {
                     Company c = new Company
                     {
-                        ID = reader.GetInt32(0),
+                        Id = reader.GetInt32(0),
                         Name = reader.GetString(1),
                         BusinessPhone = reader.GetString(2),
-                        PrimaryContactID = reader.GetInt32(3),
+                        PrimaryContactId = reader.GetInt32(3),
                         AdditionalContacts = reader.GetString(4),
                         CompanyAddress = new Address(reader.GetString(5)),
-                        WebsiteURL = reader.GetString(6),
+                        WebsiteUrl = reader.GetString(6),
                         Base64Logo = reader.GetString(7),
-                        LinkedInURL = reader.GetString(8),
+                        LinkedInUrl = reader.GetString(8),
                         Industry = reader.GetString(9),
                         WorkforceSize = reader.GetInt32(10)
                     };
-                    if (c.PrimaryContactID != 0)
-                        c.PrimaryContact = GetContact(c.PrimaryContactID);
+                    if (c.PrimaryContactId != 0)
+                        c.PrimaryContact = GetContact(c.PrimaryContactId);
                     companies.Add(c);
                 }
             }
@@ -472,11 +467,11 @@ namespace CallTracker_Lib.database
         public static bool DeleteCompany(Company c)
         {
             int affectedRows = 0;
-            string q = Queries.BuildQuery(QType.DELETE, "company", null, null, $"id={c.ID}");
+            string q = Queries.BuildQuery(QType.DELETE, "company", null, null, $"id={c.Id}");
 
             try
             {
-                using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+                using SQLiteConnection conn = new(DbConnection.GetConnectionString());
                 conn.Open();
                 using (SQLiteTransaction tr = conn.BeginTransaction())
                 {
@@ -513,7 +508,7 @@ namespace CallTracker_Lib.database
 
             string q = Queries.BuildQuery(QType.INSERT, "contact", null, columns);
 
-            using SQLiteConnection conn = new SQLiteConnection(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new SQLiteConnection(DbConnection.GetConnectionString());
             if (conn == null)
                 return -1;
             conn.Open();
@@ -540,7 +535,7 @@ namespace CallTracker_Lib.database
             }
 
             conn.Close();
-            return affectedRows != 0 ? GetLastRowIDInserted("contact") : -1;
+            return affectedRows != 0 ? GetLastRowIdInserted("contact") : -1;
         }
 
         public static bool UpdateContact(Contact c)
@@ -549,9 +544,9 @@ namespace CallTracker_Lib.database
             ArrayList? columns = GetColumns("contact");
             if (columns == null)
                 return false;
-            string q = Queries.BuildQuery(QType.UPDATE, "contact", null, columns, $"id={c.ID}");
+            string q = Queries.BuildQuery(QType.UPDATE, "contact", null, columns, $"id={c.Id}");
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             if (conn == null)
                 return false;
             conn.Open();
@@ -561,7 +556,7 @@ namespace CallTracker_Lib.database
                 using SQLiteCommand cmd = new(q, conn, tr);
                 cmd.CommandType = CommandType.Text;
 
-                cmd.Parameters.AddWithValue("@0", c.ID);
+                cmd.Parameters.AddWithValue("@0", c.Id);
                 cmd.Parameters.AddWithValue("@1", c.FirstName);
                 cmd.Parameters.AddWithValue("@2", c.LastName);
                 cmd.Parameters.AddWithValue("@3", c.Title);
@@ -587,7 +582,7 @@ namespace CallTracker_Lib.database
             Contact? c = null;
             string q = Queries.BuildQuery(QType.SELECT, "contact", null, null, $"id={id}");
 
-            using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+            using SQLiteConnection conn = new(DbConnection.GetConnectionString());
             conn.Open();
 
             using SQLiteCommand cmd = new(q, conn);
@@ -597,7 +592,7 @@ namespace CallTracker_Lib.database
                 reader.Read();
                 c = new Contact
                 {
-                    ID = reader.GetInt32(0),
+                    Id = reader.GetInt32(0),
                     FirstName = reader.GetString(1),
                     LastName = reader.GetString(2),
                     Title = reader.GetString(3),
@@ -613,7 +608,7 @@ namespace CallTracker_Lib.database
             return c;
         }
 
-        public static List<Contact> GetContactsForCompany(int companyID)
+        public static List<Contact> GetContactsForCompany(int companyId)
         {
             throw new NotImplementedException();
             //List<Company> companies = new List<Company>();
@@ -655,11 +650,11 @@ namespace CallTracker_Lib.database
         public static bool DeleteContact(Contact c)
         {
             int affectedRows = 0;
-            string q = Queries.BuildQuery(QType.DELETE, "contact", null, null, $"id={c.ID}");
+            string q = Queries.BuildQuery(QType.DELETE, "contact", null, null, $"id={c.Id}");
 
             try
             {
-                using SQLiteConnection conn = new(DBConnection.GetConnectionString());
+                using SQLiteConnection conn = new(DbConnection.GetConnectionString());
                 conn.Open();
                 using (SQLiteTransaction tr = conn.BeginTransaction())
                 {

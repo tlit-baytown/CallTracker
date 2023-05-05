@@ -1,15 +1,14 @@
-using CallTracker_GUI;
+using System.Diagnostics;
 using CallTracker_GUI.Properties;
 using CallTracker_GUI.subforms;
 using CallTracker_Lib.database;
 using CallTracker_Lib.logging;
-using System.Diagnostics;
 
-namespace CallTracker
+namespace CallTracker_GUI
 {
     public partial class MainForm : Form
     {
-        private readonly NLog.Logger Logger = LogManager<MainForm>.GetLogger();
+        private readonly NLog.Logger _logger = LogManager<MainForm>.GetLogger();
 
         public MainForm()
         {
@@ -24,26 +23,21 @@ namespace CallTracker
 
         private void openDBWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            bool result = DBConnection.TouchFile(Settings.Default.ConnectionString);
+            var result = DbConnection.TouchFile(Settings.Default.ConnectionString);
             openDBWorker.ReportProgress(100, result);
         }
 
         private void openDBWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            if (e.Result != null && e.Result is bool)
-            {
-                bool connected = (bool)e.Result;
-                if (!connected)
-                {
-                    MessageBox.Show("The database could not be opened. The application settings will now open so you can set the database up.");
-                    new SettingsForm().ShowDialog();
-                }
-            }
+            if (e.Result is not false) return;
+            
+            MessageBox.Show("The database could not be opened. The application settings will now open so you can set the database up.");
+            new SettingsForm().ShowDialog();
         }
 
         private void LoadBackgroundImage()
         {
-            Image? i = Utility.FromBase64String(Settings.Default.CompLogo_Base64);
+            var i = Utility.FromBase64String(Settings.Default.CompLogo_Base64);
             if (i == null)
                 return;
 
@@ -54,11 +48,11 @@ namespace CallTracker
         #region Menu Strip Buttons
         private void btnSettings_Click(object sender, EventArgs e)
         {
-            SettingsForm? f = Application.OpenForms.OfType<SettingsForm>().FirstOrDefault();
+            var f = Application.OpenForms.OfType<SettingsForm>().FirstOrDefault();
             if (f != null)
             {
                 f.Activate();
-                Logger.Warn("MainForm attempted to open another settings window. Only one window can be open at a time.");
+                _logger.Warn("MainForm attempted to open another settings window. Only one window can be open at a time.");
             }
             else
                 new SettingsForm().Show();
@@ -66,7 +60,7 @@ namespace CallTracker
 
         private void OpenLogFolderBtn_Click(object sender, EventArgs e)
         {
-            Process.Start("explorer.exe", CallTracker_Lib.logging.LogInitializer.GetDefaultCurrentLog(false));
+            Process.Start("explorer.exe", LogInitializer.GetDefaultCurrentLog(false));
         }
         #endregion
     }

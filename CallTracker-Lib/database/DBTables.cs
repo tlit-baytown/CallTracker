@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace CallTracker_Lib.database
 {
-    public class DBTables
+    public class DbTables
     {
-        private static readonly NLog.Logger Logger = logging.LogManager<DBTables>.GetLogger();
+        private static readonly NLog.Logger Logger = logging.LogManager<DbTables>.GetLogger();
 
 
     }

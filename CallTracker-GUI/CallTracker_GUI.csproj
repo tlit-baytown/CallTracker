@@ -2,11 +2,18 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <StartupObject>CallTracker.Program</StartupObject>
+    <LangVersion>default</LangVersion>
+    <IsPackable>false</IsPackable>
+    <PackageId>CallTracker</PackageId>
+    <Company>Tortal.tech</Company>
+    <Product>Call Tracker</Product>
+    <AssemblyVersion>0.0.0.1</AssemblyVersion>
+    <FileVersion>0.0.0.1</FileVersion>
+    <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
-﻿namespace CallTracker_GUI.user_controls
+﻿namespace CallTracker_GUI.user_controls.settings
 {
-    partial class DBSetupUsrCtl
+    partial class DbSetupUsrCtl
 {
     /// <summary> 
     /// Required designer variable.
@@ -151,7 +151,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.grpDBMaintenance);
             this.Controls.Add(this.grpDBSetup);
-            this.Name = "DBSetupUsrCtl";
+            this.Name = "DbSetupUsrCtl";
             this.Size = new System.Drawing.Size(600, 400);
             this.Load += new System.EventHandler(this.DBSetupUsrCtl_Load);
             this.grpDBSetup.ResumeLayout(false);

@@ -12,8 +12,8 @@ manager.Parse(dbContent);
 List<Note> notes = manager.GetNotes();
 foreach (Note note in notes)
 {
-    Console.WriteLine(note._noteTitle);
-    Console.WriteLine(note._noteContent);
+    Console.WriteLine(note.NoteTitle);
+    Console.WriteLine(note.NoteContent);
 }
 
 Console.WriteLine();

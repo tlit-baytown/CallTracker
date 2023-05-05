@@ -15,8 +15,8 @@ namespace CallTracker_Lib
         private static readonly Logger Logger = logging.LogManager<Note>.GetLogger();
 
         private StringBuilder _note = new StringBuilder();
-        public string _noteTitle = string.Empty;
-        public string _noteContent = string.Empty;
+        public string NoteTitle = string.Empty;
+        public string NoteContent = string.Empty;
 
         /// <summary>
         /// Create a new note with a title and content.
@@ -26,8 +26,8 @@ namespace CallTracker_Lib
         public Note(string title, string content)
         {
             _note = new StringBuilder();
-            _noteTitle = title;
-            _noteContent = content;
+            NoteTitle = title;
+            NoteContent = content;
         }
 
         /// <summary>
@@ -43,11 +43,11 @@ namespace CallTracker_Lib
         {
             _note = new StringBuilder();
 
-            if (_noteTitle.Length > 0)
-                _note = _note.Append(NoteManager.TITLE_ID).Append(_noteTitle); //append title seperator and title
-            if (_noteContent.Length > 0)
-                _note = _note.Append(NoteManager.CONTENT_ID).Append(_noteContent); //append content seperator and content
-            _note = _note.Append(NoteManager.SEPERATOR_ID); //append note seperator
+            if (NoteTitle.Length > 0)
+                _note = _note.Append(NoteManager.TitleId).Append(NoteTitle); //append title seperator and title
+            if (NoteContent.Length > 0)
+                _note = _note.Append(NoteManager.ContentId).Append(NoteContent); //append content seperator and content
+            _note = _note.Append(NoteManager.SeperatorId); //append note seperator
         }
 
         public override string ToString()

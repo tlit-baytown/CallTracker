@@ -1,5 +1,4 @@
 ﻿using CallTracker_Lib.interfaces;
-using CallTracker_Lib.utility;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -7,19 +6,19 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CallTracker_Lib.utility.Enums;
+using static CallTracker_Lib.Enums;
 
 namespace CallTracker_Lib.database.wrappers
 {
-    public class CallLog : IDBWrapper
+    public class CallLog : IDbWrapper
     {
         private static readonly NLog.Logger Logger = logging.LogManager<CallLog>.GetLogger();
 
         [Browsable(false)]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [Browsable(false)]
-        public int CompanyID { get; set; }
+        public int CompanyId { get; set; }
 
         public NoteManager? NoteManager { get; set; } = null;
 
@@ -31,7 +30,7 @@ namespace CallTracker_Lib.database.wrappers
 
         public DatabaseError Delete()
         {
-            return SQLiteConnector.DeleteCallLog(this) ? DatabaseError.NoError : DatabaseError.CallLogDelete;
+            return SqLiteConnector.DeleteCallLog(this) ? DatabaseError.NoError : DatabaseError.CallLogDelete;
         }
 
         public DatabaseError Insert()
@@ -39,13 +38,13 @@ namespace CallTracker_Lib.database.wrappers
             DatabaseError e;
             if (!IsEmpty)
             {
-                if (ID == 0)
+                if (Id == 0)
                 {
-                    ID = SQLiteConnector.InsertCallLog(this);
-                    e = ID != 0 ? DatabaseError.NoError : DatabaseError.CallLogInsert;
+                    Id = SqLiteConnector.InsertCallLog(this);
+                    e = Id != 0 ? DatabaseError.NoError : DatabaseError.CallLogInsert;
                 }
                 else
-                    e = SQLiteConnector.UpdateCallLog(this) ? DatabaseError.NoError : DatabaseError.CallLogUpdate;
+                    e = SqLiteConnector.UpdateCallLog(this) ? DatabaseError.NoError : DatabaseError.CallLogUpdate;
                 return e;
             }
             return DatabaseError.CallLogIncomplete;

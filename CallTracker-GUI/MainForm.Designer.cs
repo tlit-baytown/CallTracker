@@ -1,4 +1,4 @@
-﻿namespace CallTracker
+﻿namespace CallTracker_GUI
 {
     partial class MainForm
     {

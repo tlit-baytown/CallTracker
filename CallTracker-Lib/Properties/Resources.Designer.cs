@@ -59,5 +59,30 @@ namespace CallTracker_Lib.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BEGIN TRANSACTION;
+        ///CREATE TABLE IF NOT EXISTS &quot;contact&quot; (
+        ///	&quot;id&quot;	INTEGER NOT NULL,
+        ///	&quot;first_name&quot;	TEXT NOT NULL,
+        ///	&quot;last_name&quot;	TEXT NOT NULL,
+        ///	&quot;title&quot;	TEXT NOT NULL,
+        ///	&quot;phone&quot;	TEXT NOT NULL,
+        ///	&quot;mobile_phone&quot;	TEXT NOT NULL,
+        ///	&quot;email&quot;	TEXT NOT NULL,
+        ///	&quot;secondary_email&quot;	TEXT NOT NULL,
+        ///	&quot;is_decision_maker&quot;	INTEGER NOT NULL DEFAULT 0,
+        ///	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT)
+        ///);
+        ///CREATE TABLE IF NOT EXISTS &quot;company_calls&quot; (
+        ///	&quot;id&quot;	INTEGER NOT NULL,
+        ///	&quot;company_id&quot;	INTEGER NOT NULL,
+        ///	&quot;number_of_calls_made&quot;	INTEGER NO [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string DBSchemaString {
+            get {
+                return ResourceManager.GetString("DBSchemaString", resourceCulture);
+            }
+        }
     }
 }

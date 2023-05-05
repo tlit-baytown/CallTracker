@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CallTracker_Lib.utility.Enums;
+using static CallTracker_Lib.Enums;
 
 namespace CallTracker_Lib.interfaces
 {
     /// <summary>
     /// All classes that are considered to be database wrappers should implement this interface.
     /// </summary>
-    public interface IDBWrapper
+    public interface IDbWrapper
     {
         /// <summary>
         /// Get a value indicating if this wrapper object is considered to be empty.

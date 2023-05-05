@@ -1,12 +1,11 @@
 ﻿using CallTracker_Lib.extensions;
-using CallTracker_Lib.utility;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CallTracker_Lib.utility.Enums;
+using static CallTracker_Lib.Enums;
 
 namespace CallTracker_Lib.database.wrappers
 {
@@ -17,7 +16,7 @@ namespace CallTracker_Lib.database.wrappers
         /// <summary>
         /// Random hex identifier to mark the seperation between address components.
         /// </summary>
-        internal static readonly string SEPERATOR_ID = "<0x2A0F1D>";
+        internal static readonly string SeperatorId = "<0x2A0F1D>";
 
         public string Street { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
@@ -64,13 +63,13 @@ namespace CallTracker_Lib.database.wrappers
         /// <exception cref="ArgumentException"></exception>
         public Address(string dbContent)
         {
-            if (dbContent.StartsWith($"mailing{SEPERATOR_ID}"))
+            if (dbContent.StartsWith($"mailing{SeperatorId}"))
             {
                 IsMailingAddress = true;
-                dbContent = dbContent.Remove(0, $"mailing{SEPERATOR_ID}".Length);
+                dbContent = dbContent.Remove(0, $"mailing{SeperatorId}".Length);
             }
 
-            string[] components = dbContent.Split(SEPERATOR_ID, StringSplitOptions.RemoveEmptyEntries);
+            string[] components = dbContent.Split(SeperatorId, StringSplitOptions.RemoveEmptyEntries);
             if (components.Length != 4) //4 = street, city, state, zip-code
                 throw new ArgumentException("Address string did not contain the appropiate number of components (4).");
 
@@ -82,21 +81,21 @@ namespace CallTracker_Lib.database.wrappers
                 throw new ArgumentException("The address components must not be empty!");
         }
 
-        public string ToDBString()
+        public string ToDbString()
         {
             StringBuilder sb = new();
             if (IsMailingAddress)
-                sb = sb.Append("mailing").Append(SEPERATOR_ID);
+                sb = sb.Append("mailing").Append(SeperatorId);
             sb = sb.Append(Street)
-                .Append(SEPERATOR_ID).Append(City).Append(',')
-                .Append(SEPERATOR_ID).Append(State.ToString())
-                .Append(SEPERATOR_ID).Append(ZipCode);
+                .Append(SeperatorId).Append(City).Append(',')
+                .Append(SeperatorId).Append(State.ToString())
+                .Append(SeperatorId).Append(ZipCode);
             return sb.ToString();
         }
 
         /// <summary>
         /// Get a human-readable string for displaying. This string is not ready for database storage.
-        /// To retrieve a database string, call <see cref="ToDBString()"/>.
+        /// To retrieve a database string, call <see cref="ToDbString"/>.
         /// </summary>
         /// <returns>A string for displaying this address, or an empty string if the address is not valid according to <see cref="IsValid"/></returns>
         public override string ToString()

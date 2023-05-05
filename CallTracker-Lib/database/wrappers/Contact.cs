@@ -1,5 +1,4 @@
 ﻿using CallTracker_Lib.interfaces;
-using CallTracker_Lib.utility;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -7,16 +6,16 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CallTracker_Lib.utility.Enums;
+using static CallTracker_Lib.Enums;
 
 namespace CallTracker_Lib.database.wrappers
 {
-    public class Contact : IDBWrapper
+    public class Contact : IDbWrapper
     {
         private static readonly NLog.Logger Logger = logging.LogManager<Contact>.GetLogger();
 
         [Browsable(false)]
-        public int ID { get; set; }
+        public int Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
@@ -38,7 +37,7 @@ namespace CallTracker_Lib.database.wrappers
 
         public DatabaseError Delete()
         {
-            return SQLiteConnector.DeleteContact(this) ? DatabaseError.NoError : DatabaseError.ContactDelete;
+            return SqLiteConnector.DeleteContact(this) ? DatabaseError.NoError : DatabaseError.ContactDelete;
         }
 
         public DatabaseError Insert()
@@ -46,13 +45,13 @@ namespace CallTracker_Lib.database.wrappers
             DatabaseError e;
             if (!IsEmpty)
             {
-                if (ID == 0)
+                if (Id == 0)
                 {
-                    ID = SQLiteConnector.InsertContact(this);
-                    e = ID != 0 ? DatabaseError.NoError : DatabaseError.ContactInsert;
+                    Id = SqLiteConnector.InsertContact(this);
+                    e = Id != 0 ? DatabaseError.NoError : DatabaseError.ContactInsert;
                 }
                 else
-                    e = SQLiteConnector.UpdateContact(this) ? DatabaseError.NoError : DatabaseError.ContactUpdate;
+                    e = SqLiteConnector.UpdateContact(this) ? DatabaseError.NoError : DatabaseError.ContactUpdate;
                 return e;
             }
             return DatabaseError.ContactIncomplete;

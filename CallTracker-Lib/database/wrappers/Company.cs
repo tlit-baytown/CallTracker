@@ -1,5 +1,4 @@
 ﻿using CallTracker_Lib.interfaces;
-using CallTracker_Lib.utility;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -7,26 +6,26 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CallTracker_Lib.utility.Enums;
+using static CallTracker_Lib.Enums;
 
 namespace CallTracker_Lib.database.wrappers
 {
-    public class Company : IDBWrapper
+    public class Company : IDbWrapper
     {
         private static readonly NLog.Logger Logger = logging.LogManager<Company>.GetLogger();
 
         [Browsable(false)]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
         public string BusinessPhone { get; set; } = string.Empty;
-        public int PrimaryContactID { get; set; }
+        public int PrimaryContactId { get; set; }
         public Contact? PrimaryContact { get; set; } = null;
         public string AdditionalContacts { get; set; } = "NA";
         public Address? CompanyAddress { get; set; } = null;
-        public string WebsiteURL { get; set; } = string.Empty;
+        public string WebsiteUrl { get; set; } = string.Empty;
         public string Base64Logo { get; set; } = string.Empty;
-        public string LinkedInURL { get; set; } = string.Empty;
+        public string LinkedInUrl { get; set; } = string.Empty;
         public string Industry { get; set; } = string.Empty;
         public int WorkforceSize { get; set; }
 
@@ -48,7 +47,7 @@ namespace CallTracker_Lib.database.wrappers
                 if (PrimaryContact == null)
                     return DatabaseError.CompanyContactNull;
 
-                if (PrimaryContact.ID == 0)
+                if (PrimaryContact.Id == 0)
                     e = PrimaryContact.Insert();
                 else
                     e = PrimaryContact.Update();
@@ -56,16 +55,16 @@ namespace CallTracker_Lib.database.wrappers
                 if (e != DatabaseError.NoError)
                     return e;
 
-                PrimaryContactID = PrimaryContact.ID;
+                PrimaryContactId = PrimaryContact.Id;
                 #endregion
-                if (ID == 0)
+                if (Id == 0)
                 {
                     
-                    ID = SQLiteConnector.InsertCompany(this);
-                    e = ID != 0 ? DatabaseError.NoError : DatabaseError.CompanyInsert;
+                    Id = SqLiteConnector.InsertCompany(this);
+                    e = Id != 0 ? DatabaseError.NoError : DatabaseError.CompanyInsert;
                 }
                 else
-                    e = SQLiteConnector.UpdateCompany(this) ? DatabaseError.NoError : DatabaseError.CompanyUpdate;
+                    e = SqLiteConnector.UpdateCompany(this) ? DatabaseError.NoError : DatabaseError.CompanyUpdate;
                 return e;
             }
             return DatabaseError.CompanyIncomplete;
@@ -78,7 +77,7 @@ namespace CallTracker_Lib.database.wrappers
 
         public DatabaseError Delete()
         {
-            return SQLiteConnector.DeleteCompany(this) ? DatabaseError.NoError : DatabaseError.CompanyDelete;
+            return SqLiteConnector.DeleteCompany(this) ? DatabaseError.NoError : DatabaseError.CompanyDelete;
         }
     }
 }

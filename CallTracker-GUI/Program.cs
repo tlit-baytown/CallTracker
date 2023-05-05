@@ -1,4 +1,4 @@
-namespace CallTracker
+namespace CallTracker_GUI
 {
     internal static class Program
     {

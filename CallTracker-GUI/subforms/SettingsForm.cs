@@ -11,16 +11,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CallTracker_GUI.user_controls.settings;
 
 namespace CallTracker_GUI.subforms
 {
     public partial class SettingsForm : Form
     {
-        private readonly NLog.Logger Logger = LogManager<SettingsForm>.GetLogger();
+        private readonly NLog.Logger _logger = LogManager<SettingsForm>.GetLogger();
 
-        private List<ISettingPage> settingPages = new List<ISettingPage>
+        private List<ISettingPage> _settingPages = new List<ISettingPage>
         {
-            new DBSetupUsrCtl()
+            new DbSetupUsrCtl()
         };
 
         public SettingsForm()
@@ -30,12 +31,12 @@ namespace CallTracker_GUI.subforms
 
         private void SettingsForm_Load(object sender, EventArgs e)
         {
-            Controls.Add(settingPages.Find(n => n.UniqueName.Equals("db_setup")) as UserControl);
+            Controls.Add(_settingPages.Find(n => n.UniqueName.Equals("db_setup")) as UserControl);
         }
 
         private void SaveSettingsBtn_Click(object sender, EventArgs e)
         {
-            foreach (ISettingPage settingPage in settingPages)
+            foreach (ISettingPage settingPage in _settingPages)
             {
                 if (settingPage.SettingsChanged)
                 {
@@ -44,7 +45,7 @@ namespace CallTracker_GUI.subforms
                 }
             }
             MessageBox.Show(this, "Settings Saved!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            Logger.Info("Settings have been updated.");
+            _logger.Info("Settings have been updated.");
         }
 
         private void ResetToDefaultBtn_Click(object sender, EventArgs e)
@@ -55,7 +56,7 @@ namespace CallTracker_GUI.subforms
                 MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
-                foreach (ISettingPage settingPage in settingPages)
+                foreach (ISettingPage settingPage in _settingPages)
                     settingPage.ResetSettings();
         }
 
@@ -77,7 +78,7 @@ namespace CallTracker_GUI.subforms
         private bool CheckForChanges()
         {
             bool changesPending = false;
-            foreach (ISettingPage settingPage in settingPages)
+            foreach (ISettingPage settingPage in _settingPages)
                 changesPending = settingPage.SettingsChanged;
                     
             if (changesPending)

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using static CallTracker_Lib.utility.Enums;
 
-namespace CallTracker_Lib.utility
+namespace CallTracker_Lib
 {
     /// <summary>
     /// This class represents the various Enums used throughout Survey Manager.

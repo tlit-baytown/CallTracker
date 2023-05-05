@@ -1,20 +1,11 @@
-﻿using CallTracker_GUI.Properties;
+﻿using System.Diagnostics;
+using CallTracker_GUI.Properties;
 using CallTracker_Lib.database;
 using CallTracker_Lib.interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace CallTracker_GUI.user_controls
+namespace CallTracker_GUI.user_controls.settings
 {
-    public partial class DBSetupUsrCtl : UserControl, ISettingPage
+    public partial class DbSetupUsrCtl : UserControl, ISettingPage
     {
         public string UniqueName { get => "db_setup"; }
         public bool SettingsChanged { get; set; } = false;
@@ -23,7 +14,7 @@ namespace CallTracker_GUI.user_controls
         private string _connectString = string.Empty;
         private bool _connectionSuccessful = false;
 
-        public DBSetupUsrCtl()
+        public DbSetupUsrCtl()
         {
             InitializeComponent();
             Dock = DockStyle.Fill;
@@ -44,7 +35,7 @@ namespace CallTracker_GUI.user_controls
             {
                 _dbPath = Settings.Default.DBPath;
                 lblDBPath.Text = _dbPath;
-                _connectionSuccessful = DBConnection.TouchFile(Settings.Default.ConnectionString);
+                _connectionSuccessful = DbConnection.TouchFile(Settings.Default.ConnectionString);
 
                 if (!_connectionSuccessful)
                     MessageBox.Show(this, "The database file could not be opened or read from.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -74,17 +65,24 @@ namespace CallTracker_GUI.user_controls
             if (FileDlgSaveDB.ShowDialog() == DialogResult.OK)
             {
                 _dbPath = FileDlgSaveDB.FileName;
-                _connectionSuccessful = DBConnection.TouchFileWithPath(_dbPath);
+                _connectionSuccessful = DbConnection.TouchFileWithPath(_dbPath);
 
                 if (!_connectionSuccessful)
                     MessageBox.Show(this, "The database file could not be saved.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
                 {
                     lblDBPath.Text = _dbPath;
-                    _connectString = DBConnection.CreateConnectionString(_dbPath);
+                    _connectString = DbConnection.CreateConnectionString(_dbPath);
                     SettingsChanged = true;
 
                     //TODO: Actually create the db schema in the empty file.
+                    if (DbConnection.CreateSchema())
+                        MessageBox.Show(this, "New database has been initialzed successfully!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.None);
+                    else
+                        MessageBox.Show(this,
+                            "The database could not be initialzed. Please check the log file for errors.", "Oops",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             SetButtons();
@@ -95,14 +93,14 @@ namespace CallTracker_GUI.user_controls
             if (FileDlgOpenDB.ShowDialog() == DialogResult.OK)
             {
                 _dbPath = FileDlgOpenDB.FileName;
-                _connectionSuccessful = DBConnection.TouchFileWithPath(_dbPath);
+                _connectionSuccessful = DbConnection.TouchFileWithPath(_dbPath);
 
                 if (!_connectionSuccessful)
                     MessageBox.Show(this, "The database file could not be opened or read from.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
                 {
                     lblDBPath.Text = _dbPath;
-                    _connectString = DBConnection.CreateConnectionString(_dbPath);
+                    _connectString = DbConnection.CreateConnectionString(_dbPath);
                     Settings.Default.ConnectionString = _connectString;
                     SettingsChanged = true;
                 }
